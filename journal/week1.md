@@ -244,7 +244,7 @@ volumes:
 
 ### Container Security
 
-To ensure the security of containerized applications, I focused on identifying and fixing any vulnerabilities. I utilized Snyk, a container security tool, to scan our containers for potential security issues.
+To ensure the security of containerized applications, I focused on identifying and fixing any vulnerabilities. I utilized Snyk, a container security tool, to scan containers for potential security issues.
 
 ![](assets/snyk.png)
 
