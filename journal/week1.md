@@ -251,7 +251,6 @@ To ensure the security of containerized applications, I focused on identifying a
 ### References
 
 - Docker Documentation [link](https://docs.docker.com/)
-- Docker Hub [link](https://hub.docker.com/)
 - Docker Compose Documentation [link](https://docs.docker.com/compose/)
 - Snyk Documentation [link](https://snyk.io/docs/)
 - Top 10 Docker Container Security Best Practices with Tutorial [link](https://www.youtube.com/watch?v=OjZz4D0B-cA&list=PLBfufR7vyJJ7k25byhRXJldB5AiwgNnWv&index=26)
