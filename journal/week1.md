@@ -19,7 +19,7 @@ During the first week of the project, I focused on app containerization to impro
 
 ### Run the Applications Locally
 
-Launched my gitpod enviroment and ran the backend application locally. This step lets you to verify that the application is functioning correctly before proceeding with containerization
+Launched my gitpod environment and ran the backend application locally. This step lets you to verify that the application is functioning correctly before proceeding with containerization
 
  - Backend Application
 
