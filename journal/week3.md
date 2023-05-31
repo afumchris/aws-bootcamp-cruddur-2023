@@ -5,9 +5,9 @@
 - [Introduction](#introduction)
 - [Amazon Cognito User Pool](#amazon-cognito-user-pool)
 - [Installation and Configuration of AWS Amplify](#installation-and-configuration-of-aws-amplify)
-- Implementing API Calls to Amazon Cognito for Custom Signup, Signin, Confirmation and Recovery Pages
-- Server-Side Verification of JWT
-- References
+- [Implementing API Calls to Amazon Cognito for Custom Signup Signin Confirmation and Recovery Pages](#implementing-api-calls-to-amazon-cognito-for-custom-signup-signin-confirmation-and-recovery-pages)
+- [Server-Side Verification of JWT](#server-side-verification-of-jwt)
+- [References](#references)
 
 ### Introduction
 
@@ -43,15 +43,61 @@ By following these steps, you will be able to log in to your AWS Console, select
 
 To integrate Amazon Cognito into our application, we installed and configured the Amplify framework. Amplify simplifies the development process by providing a set of libraries, tools, and UI components that work seamlessly with AWS services, including Amazon Cognito.
 
-To install and configure the Amplify client-side library for Amazon Cognito, follow these steps utilizing this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/52550a07c58e4d13a1543e48b77728832c1198ef):
+To install and configure the Amplify client-side library for Amazon Cognito, follow these steps, utilizing this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/52550a07c58e4d13a1543e48b77728832c1198ef):
 
   - Make sure you are in the `frontend-react-js` directory of your project, install Amplify by running the command `npm i aws-amplify --save`. This will update the package.json and package-lock.json files to include the Amplify package.
   - Updated the environment variables in the `docker-compose.yml` file to configure the frontend application with the AWS project region, AWS Cognito region, AWS user pools ID, and client ID.
   - Configured Amplify in the `frontend-react-js/src/App.js` file with the specified AWS project region, AWS Cognito region, AWS user pools ID, and client ID.
 
-### Implementing API Calls to Amazon Cognito for Custom Signup, Signin, Confirmation and Recovery Pages
+### Implementing API Calls to Amazon Cognito for Custom Signup Signin Confirmation and Recovery Pages
 
+By leveraging the Amplify libraries, we were able to interact with the User Pool and perform various authentication actions securely and efficiently.
 
+To implement API calls to Amazon Cognito for Custom Signup, Signin, Confirmation and Recovery Pages, follow these steps, utilizing this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/2961e458c0e06e827a4dea1eb7857ad341da78d6):
+
+  - Update the `App.js` file to use the correct `client_id` for the User Pool.
+  - Modify the `DesktopSidebar.js` component to display the trending and suggested sections based on user authentication status.
+  - Update the `ProfileInfo.js` component to handle user sign-out using the Auth.signOut method.
+  - Modify the `ConfirmationPage.js` component to resend confirmation codes and handle user confirmation using the Auth.confirmSignUp method.
+  - Update the `HomeFeedPage.js` component to check user authentication status using the Auth.currentAuthenticatedUser method.
+  - Modify the `RecoverPage.js` component to handle password recovery and confirmation using the Auth.forgotPassword and Auth.forgotPasswordSubmit methods.
+  - Update the `SigninPage.js` component to handle user sign-in using the Auth.signIn method.
+  - Modify the `SignupPage.js` component to handle user sign-up using the Auth.signUp method.
+
+signup page
+
+![](assets/signup.png)
+
+signin page
+
+![](assets/cruddur-signin.png)
+
+confirmation page
+
+![](assets/confirmation.png)
+
+recovery page 
+
+![](assets/recovery.png)
+
+### Server-Side Verification of JWT
+
+To enhance the security of our authentication system, we implemented server-side verification of JSON Web Tokens (JWT).
+
+The changes as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/f5d8e7b5fbb80a0c241eec9de031a85bcd554877) include integrating AWS Cognito for JWT token verification, configuring CORS, and adding `extra_crud` when cognito_user_id != None.
+
+Upon signing in with the newly created user, the home page will display In the lower-left corner, the name and preferred username of the user will be presented. Additionally, a message from Lore, which we incorporated in the `backend-flask/services/home_activities.py` file as `extra_crud`, will be showcased at the top of the page.
+
+![](assets/jwt.png)
+
+Once signed out, the home page will be displayed without the message by Lore.
+
+![](assets/afterjwt.png)
+
+### References
+
+- AWS Amplify Documentation [link](https://docs.aws.amazon.com/amplify/index.html)
+- Amazon Cognito Documentation [link](https://docs.aws.amazon.com/cognito/index.html)
 
 
 
