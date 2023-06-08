@@ -6,7 +6,7 @@
 - [Bash Scripts and SQL for Postgres Operations](#bash-scripts-and-sql-for-postgres-operations)
 - [RDS DB Instance on AWS](#rds-db-instance-on-aws)
 - [Implementing a Postgres Client](#implementing-a-postgres-client)
-- AWS Lambda for Cognito Post Confirmation
+- [AWS Lambda for Cognito Post Confirmation](#aws-lambda-for-cognito-post-confirmation)
 - Activity Creation
 - References
 
@@ -27,7 +27,7 @@ gp env CONNECTION_URL="postgresql://postgres:password@localhost:5432/cruddur"
  
  [This commits](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/ff938a80c2a9b3dd2ea86ba568985939729a320b) include changes to various scripts and SQL files. To make the script executable, run `chmod u+x <PATH_OF_SCRIPT>`. Here is a brief overview of the changes and their functionalities:
 
-   - `db-connect`: Added a script to establish a connection to the PostgreSQL database. Determines the appropriate connection URL based on the environment (prod or default).Executes the psql command to establish the connection.
+   - `db-connect`: Added a script to establish a connection to the PostgreSQL database. Determines the appropriate connection URL based on the environment (prod or local).Executes the psql command to establish the connection.
    - `db-create`: Added a script to create a new PostgreSQL database named `cruddur`. Uses the connection URL to connect to the PostgreSQL server. Executes the SQL command `create database cruddur` to create the database.
    - `db-drop`: Added a script to drop the PostgreSQL database named `cruddur`. Uses the connection URL to connect to the PostgreSQL server. Executes the SQL command `drop database cruddur` to drop the database.
    - `db-schema-load`: Added a script to load the database schema from the file `db/schema.sql`. Determines the appropriate connection URL based on the environment. Uses the `psql` command to execute the SQL script and load the schema.
@@ -36,6 +36,8 @@ gp env CONNECTION_URL="postgresql://postgres:password@localhost:5432/cruddur"
    - `db-setup`: Added a script to set up the PostgreSQL database by executing a series of scripts in the correct order. Sources the `db-drop`, `db-create`, `db-schema-load`, and `db-seed` scripts using the source command.
    - `db/schema.sql`: Modified the SQL schema file to define the structure of the users and activities tables. Added columns for UUID, display name, handle, cognito user ID, timestamps, and other relevant fields.
    - `db/seed.sql`: Modified the SQL seed data file to insert initial data into the users and activities tables. Includes records for users with display names, handles, and mock Cognito user IDs.Includes an example activity record with a message and expiration timestamp.
+
+Run `docker compose up` and the following scripts `db-create`, `db-schema-load`, `db-seed` and `db-connect` to connect to the local database.
 
 ![](assets/dev-psql.png)
 
@@ -106,3 +108,65 @@ Update `gitpod.yml` and create a new file `backend-flask/bin/rds-update-sg-rule`
 
 
 ### Implementing a Postgres Client
+
+In this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/7c79d53e9b4271cfe568130c684d02a1b1362635), several changes were made to replace the mock data on the home page with data queried from the database using SQL. This was achieved by implementing a PostgreSQL client for Python with a connection pool. Here's an overview of the steps involved:
+
+   - Add the following dependencies to the `backend-flask/requirements.txt` file `psycopg[binary]` and `psycopg[pool]`. These dependencies will allow us to use the psycopg2 library for interacting with PostgreSQL.
+   - Set the CONNECTION_URL environment variable in the `docker-compose.yml` file for the `backend-flask` application. This configuration will ensure that the application connects to the PostgreSQL database using the specified URL:
+
+```sh
+CONNECTION_URL: "postgresql://postgres:password@db:5432/cruddur"
+```
+
+   - Create the `backend-flask/lib/db.py` file to define the DB object and connection pool. This file will contain the necessary code to establish a connection pool using psycopg2.
+   - Replace the mock endpoint in `backend-flask/services/home_activities.py` with a real API call. Instead of using mock data, this updated code will execute SQL queries against the database using the psycopg2 library to fetch the required activities for the `home page`.
+
+After running `docker-compose up`, you will observe that the home page displays the activities specified in the `backend-flask/db/seed.sql` file, rather than the previous mock data. This change confirms that the application is now fetching data from the PostgreSQL database.
+
+![](/journal/dev-query.png)
+
+### AWS Lambda for Cognito Post Confirmation
+
+We explored AWS Lambda for Cognito Post Confirmation, you will need to modify the user signup process as shown in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/3081cb032d9d4215c023eebea0a6e4e1390a870b) to insert the newly signed-up user into the users table in the RDS database.
+
+Here are the changes made to the specified files:
+
+  - `aws/lambdas/cruddur-post-confirmation.py`: Added a new Lambda function lambda_handler that handles the post-confirmation event.
+  - `backend-flask/db/schema.sql`: Modified the public.users table schema by adding the email column.
+  - `docker-compose.yml`: Modified the CONNECTION_URL environment variable to use the ${PROD_CONNECTION_URL} variable.
+
+Create a lambda function with the following configurations:
+
+  - Sign in to the AWS Management Console and open the AWS Lambda service.
+  - Click on Create function to create a new Lambda function.
+  - Choose the `Author from scratch` option.
+  - Provide a name for your Lambda function, such as `cruddur-post-confirmation`.
+  - Choose Python 3.8 as the runtime environment for your Lambda function.
+  - Create function
+  - For code source, copy the code as seen in `aws/lambdas/cruddur-post-confirrmation.py` and deploy.
+  - In the Configuration tab of the Lambda function console, add environment variable for the database. For Key use `CONNECTION_URL`,  and the Value equals to our `PROD_CONNECTION_URL`
+  - By referencing the provided [link](https://github.com/jetbridge/psycopg2-lambda-layer), Add a Layer for psycopg2 by specifying an appropriate ARN. In my particular case, I utilized the ARN: `arn:aws:lambda:us-east-1:898466741470:layer:psycopg2-py38:2`
+  - In the configurations tab of AWS Lambda, you can grant permissions to the execution role by creating a policy named `AWSLambdaVPCAccessExecutionRole` in the IAM service's 'Policies' section. This policy will define the required permissions for accessing EC2 resources:
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:CreateNetworkInterface",
+        "ec2:DeleteNetworkInterface",
+        "ec2:DescribeInstances",
+        "ec2:AttachNetworkInterface"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+  - In the configurations tab of AWS Lambda, you can edit the VPC settings to establish a connection between Lambda and the RDS instance within a VPC. This allows Lambda to securely access the RDS instance. The resulting page will display the VPC configuration settings, as shown in the provided screenshot
+
+In Amazon Cognito's "cruddur-user-pool," configure a Lambda trigger for the "sign-up post confirmation" event. Assign the Lambda function "cruddur-post-confirmation" to the trigger. Delete the existing user to allow signing up again and verify if the user is inserted into the RDS instance's users table.
