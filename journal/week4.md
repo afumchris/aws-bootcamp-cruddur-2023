@@ -12,11 +12,11 @@
 
 ### Introduction
 
-During the fourth week of the project, our focus was on working with Postgres and RDS (Relational Database Service). We aimed to enhance our understanding of Postgres operations, set up an RDS DB instance on AWS, implement a Postgres client, utilize AWS Lambda for Cognito Post Confirmation, and create activities within Cruddur.
+During the fourth week of the project. We aimed to enhance our understanding of Postgres operations, set up an RDS DB instance on AWS, implement a Postgres client, utilize AWS Lambda for Cognito Post Confirmation, and create activities within Cruddur.
 
 ### Bash Scripts and SQL for Postgres Operations
 
- We focused on the utilization of Bash scripts and SQL for executing different operations in Postgres. Our objective was to automate tasks like creating databases, tables, inserting data, and querying by leveraging the capabilities of Bash scripts. Furthermore, we examined the effectiveness of SQL statements in efficiently manipulating and retrieving data from our Postgres database.
+ We utilize Bash scripts and SQL for executing different operations in Postgres. Our objective was to automate tasks like creating databases, tables, inserting data, and querying by leveraging the capabilities of Bash scripts. Furthermore, we examined the effectiveness of SQL statements in efficiently manipulating and retrieving data from our Postgres database.
  
  In order to work with the local Postgres, it is necessary to define the CONNECTION_URL. This can be achieved by exporting the variable using the following command:
  
@@ -27,15 +27,15 @@ gp env CONNECTION_URL="postgresql://postgres:password@localhost:5432/cruddur"
  
  [This commits](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/ff938a80c2a9b3dd2ea86ba568985939729a320b) include changes to various scripts and SQL files. To make the script executable, run `chmod u+x <PATH_OF_SCRIPT>`. Here is a brief overview of the changes and their functionalities:
 
-   - `db-connect`: Added a script to establish a connection to the PostgreSQL database. Determines the appropriate connection URL based on the environment (prod or local).Executes the psql command to establish the connection.
-   - `db-create`: Added a script to create a new PostgreSQL database named `cruddur`. Uses the connection URL to connect to the PostgreSQL server. Executes the SQL command `create database cruddur` to create the database.
-   - `db-drop`: Added a script to drop the PostgreSQL database named `cruddur`. Uses the connection URL to connect to the PostgreSQL server. Executes the SQL command `drop database cruddur` to drop the database.
-   - `db-schema-load`: Added a script to load the database schema from the file `db/schema.sql`. Determines the appropriate connection URL based on the environment. Uses the `psql` command to execute the SQL script and load the schema.
-   - `db-seed`: Added a script to seed the PostgreSQL database with initial data from `db/seed.sql`. Connects to the PostgreSQL server using the provided connection URL. Executes the SQL script to insert data into the users and activities tables.
-   - `db-sessions`: Added a script to retrieve information about active sessions in the PostgreSQL database. Determines the appropriate connection URL based on the environment. Executes the SQL command to query the pg_stat_activity view and fetch session information.
-   - `db-setup`: Added a script to set up the PostgreSQL database by executing a series of scripts in the correct order. Sources the `db-drop`, `db-create`, `db-schema-load`, and `db-seed` scripts using the source command.
-   - `db/schema.sql`: Modified the SQL schema file to define the structure of the users and activities tables. Added columns for UUID, display name, handle, cognito user ID, timestamps, and other relevant fields.
-   - `db/seed.sql`: Modified the SQL seed data file to insert initial data into the users and activities tables. Includes records for users with display names, handles, and mock Cognito user IDs.Includes an example activity record with a message and expiration timestamp.
+   - `db-connect`: Establishes a connection to the PostgreSQL database by dynamically determining the suitable connection URL according to the environment (production or local). Executes the psql command to successfully establish the connection.
+   - `db-create`: Incorporates the creation of a new PostgreSQL database named `cruddur`. Utilizes the connection URL to establish a connection with the PostgreSQL server. Executes the SQL command `create database cruddur` to effectively create the desired database.
+   - `db-drop`:  Facilitates the dropping of the PostgreSQL database named `cruddur`. Utilizes the connection URL to establish a connection with the PostgreSQL server. Executes the SQL command `drop database cruddur` to successfully remove the specified database..
+   - `db-schema-load`: Load the database schema from the file `db/schema.sql`. Determines the suitable connection URL based on the current environment. Utilizes the `psql` command to execute the SQL script and effectively load the schema into the database.
+   - `db-seed`: Seeds the PostgreSQL database with initial data sourced from `db/seed.sql`. Establishes a connection to the PostgreSQL server using the provided connection URL. Executes the SQL script to insert data into the users and activities tables, effectively populating the database with the necessary information.
+   - `db-sessions`: Retrieves information regarding active sessions within the PostgreSQL database. Dynamically determines the suitable connection URL based on the current environment. Executes the SQL command to query the pg_stat_activity view and fetches relevant session information.
+   - `db-setup`: Sets up the PostgreSQL database by executing a sequence of scripts in the correct order. Sources the `db-drop`, `db-create`, `db-schema-load`, and `db-seed` scripts using the source command to ensure proper execution and ordering of the scripts.
+   - `db/schema.sql`: Defines the structure of the users and activities tables. Adds columns for UUID, display name, handle, cognito user ID, timestamps, and other relevant fields.
+   - `db/seed.sql`: Populates the users and activities tables with initial data. Inserts records into the users table containing display names, handles, and mock Cognito user IDs. Additionally, includes an example activity record in the activities table, consisting of a message and expiration timestamp.
 
 Run `docker compose up` and the following commands `./bin/db-create`, `./bin/db-schema-load`, `./bin/db-seed` and `./bin/db-connect` to connect to the local database.
 
@@ -45,7 +45,7 @@ Run `docker compose up` and the following commands `./bin/db-create`, `./bin/db-
 
 We created an RDS DB instance on AWS. We followed the AWS documentation and guidelines to create a PostgreSQL database instance with the desired specifications, such as storage capacity, instance type, and security configurations. We ensured proper network connectivity and access control for our RDS instance.
 
-Utilize the command line with the following commands to create a RDS database instance:
+Run the following command to create a RDS database instance:
 
 ```sh
 aws rds create-db-instance \
@@ -87,7 +87,7 @@ Once you have the IP address, you can follow these steps in the AWS console:
   - Save the changes.
 
 
-After making these modifications, your AWS console should resemble the screenshot provided below as confirmation that the inbound rules have been successfully updated.
+After making these modifications, your AWS console should look like  the screenshot provided below as confirmation that the inbound rules have been successfully updated.
 
 ![](assets/sg-rule.png)
 
@@ -104,8 +104,7 @@ aws ec2 modify-security-group-rules \
     --security-group-rules "SecurityGroupRuleId=$DB_SG_RULE_ID,SecurityGroupRule={IpProtocol=tcp,FromPort=5432,ToPort=5432,CidrIpv4=$GITPOD_IP/32}"
 ```
 
-Update `gitpod.yml` and create a new file `backend-flask/bin/rds-update-sg-rule` for the security group rules of the RDS instance to automatically updated whenever the Gitpod workspace is started using this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/38267c9ce3790dc44f51bc1520b7f2178d50f0ba)
-
+Using this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/38267c9ce3790dc44f51bc1520b7f2178d50f0ba) update `gitpod.yml` and create a new file `backend-flask/bin/rds-update-sg-rule` for the security group rules of the RDS instance to automatically updated whenever the Gitpod workspace is started. 
 
 ### Implementing a Postgres Client
 
@@ -118,7 +117,7 @@ In this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/7
 CONNECTION_URL: "postgresql://postgres:password@db:5432/cruddur"
 ```
 
-   - Create the `backend-flask/lib/db.py` file to define the DB object and connection pool. This file will contain the necessary code to establish a connection pool using psycopg2.
+   - Create the `backend-flask/lib/db.py` file to define the `DB` object and connection pool. This file will contain the necessary code to establish a connection pool using psycopg2.
    - Replace the mock endpoint in `backend-flask/services/home_activities.py` with a real API call. Instead of using mock data, this updated code will execute SQL queries against the database using the psycopg2 library to fetch the required activities for the `home page`.
 
 After running `docker-compose up`, you will observe that the home page displays the activities specified in the `backend-flask/db/seed.sql` file, rather than the previous mock data. This change confirms that the application is now fetching data from the PostgreSQL database.
@@ -138,7 +137,7 @@ Here are the changes made to the specified files:
 Create a lambda function with the following configurations:
 
   - Sign in to the AWS Management Console and open the AWS Lambda service.
-  - Click on Create function to create a new Lambda function.
+  - Click on `Create function` to create a new Lambda function.
   - Choose the `Author from scratch` option.
   - Provide a name for your Lambda function, such as `cruddur-post-confirmation`.
   - Choose Python 3.8 as the runtime environment for your Lambda function.
@@ -146,7 +145,7 @@ Create a lambda function with the following configurations:
   - For code source, copy the code as seen in `aws/lambdas/cruddur-post-confirrmation.py` and deploy.
   - In the Configuration tab of the Lambda function console, add environment variable for the database. For Key use `CONNECTION_URL`,  and for Value use `postgresql://<master-username>:<master-user-password>@<aws-rds-endpoint>:<port>/<db-name>`
   - By referencing the provided [link](https://github.com/jetbridge/psycopg2-lambda-layer), Add a Layer for psycopg2 by specifying an appropriate ARN. In my particular case, I utilized the ARN: `arn:aws:lambda:us-east-1:898466741470:layer:psycopg2-py38:2`
-  - In the configurations tab of AWS Lambda, grant permissions to the execution role by creating a policy named `AWSLambdaVPCAccessExecutionRole` in the IAM service's 'Policies' section. This policy will define the required permissions for accessing EC2 resources:
+  - In the configurations tab of AWS Lambda, grant permissions to the execution role by creating a policy named `AWSLambdaVPCAccessExecutionRole` in the IAM service's Policies section. This policy will define the required permissions for accessing EC2 resources:
 
 ```json
 {
@@ -183,7 +182,7 @@ Run `docker compose up` and the following command `./bin/db-schema-load prod`, a
 
 ![](assets/prod-conn.png)
 
-To review the logs for the Lambda function "cruddur-post-confirmation" at CloudWatch, follow these steps:
+To review the logs for the Lambda function `cruddur-post-confirmation` at CloudWatch, follow these steps:
   - Access the CloudWatch service in the AWS Management Console.
   - Navigate to `Log groups` and search for the log group named `/aws/lambda/cruddur-post-confirmation`.
   - Click on the log group to view the logs associated with the Lambda function.
