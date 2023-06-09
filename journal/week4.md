@@ -7,8 +7,8 @@
 - [RDS DB Instance on AWS](#rds-db-instance-on-aws)
 - [Implementing a Postgres Client](#implementing-a-postgres-client)
 - [AWS Lambda for Cognito Post Confirmation](#aws-lambda-for-cognito-post-confirmation)
-- Activity Creation
-- References
+- [Activity Creation](#activity-creation)
+- [References](#references)
 
 ### Introduction
 
@@ -37,7 +37,7 @@ gp env CONNECTION_URL="postgresql://postgres:password@localhost:5432/cruddur"
    - `db/schema.sql`: Modified the SQL schema file to define the structure of the users and activities tables. Added columns for UUID, display name, handle, cognito user ID, timestamps, and other relevant fields.
    - `db/seed.sql`: Modified the SQL seed data file to insert initial data into the users and activities tables. Includes records for users with display names, handles, and mock Cognito user IDs.Includes an example activity record with a message and expiration timestamp.
 
-Run `docker compose up` and the following scripts `db-create`, `db-schema-load`, `db-seed` and `db-connect` to connect to the local database.
+Run `docker compose up` and the following commands `./bin/db-create`, `./bin/db-schema-load`, `./bin/db-seed` and `./bin/db-connect` to connect to the local database.
 
 ![](assets/dev-psql.png)
 
@@ -133,7 +133,7 @@ Here are the changes made to the specified files:
 
   - `aws/lambdas/cruddur-post-confirmation.py`: Added a new Lambda function lambda_handler that handles the post-confirmation event.
   - `backend-flask/db/schema.sql`: Modified the public.users table schema by adding the email column.
-  - `docker-compose.yml`: Modified the CONNECTION_URL environment variable to use the ${PROD_CONNECTION_URL} variable.
+  - `docker-compose.yml`: Modified the `CONNECTION_URL` environment variable to use the `${PROD_CONNECTION_URL}` variable.
 
 Create a lambda function with the following configurations:
 
@@ -144,29 +144,83 @@ Create a lambda function with the following configurations:
   - Choose Python 3.8 as the runtime environment for your Lambda function.
   - Create function
   - For code source, copy the code as seen in `aws/lambdas/cruddur-post-confirrmation.py` and deploy.
-  - In the Configuration tab of the Lambda function console, add environment variable for the database. For Key use `CONNECTION_URL`,  and the Value equals to our `PROD_CONNECTION_URL`
+  - In the Configuration tab of the Lambda function console, add environment variable for the database. For Key use `CONNECTION_URL`,  and for Value use `postgresql://<master-username>:<master-user-password>@<aws-rds-endpoint>:<port>/<db-name>`
   - By referencing the provided [link](https://github.com/jetbridge/psycopg2-lambda-layer), Add a Layer for psycopg2 by specifying an appropriate ARN. In my particular case, I utilized the ARN: `arn:aws:lambda:us-east-1:898466741470:layer:psycopg2-py38:2`
-  - In the configurations tab of AWS Lambda, you can grant permissions to the execution role by creating a policy named `AWSLambdaVPCAccessExecutionRole` in the IAM service's 'Policies' section. This policy will define the required permissions for accessing EC2 resources:
+  - In the configurations tab of AWS Lambda, grant permissions to the execution role by creating a policy named `AWSLambdaVPCAccessExecutionRole` in the IAM service's 'Policies' section. This policy will define the required permissions for accessing EC2 resources:
 
-```
+```json
 {
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "ec2:DescribeNetworkInterfaces",
-        "ec2:CreateNetworkInterface",
-        "ec2:DeleteNetworkInterface",
-        "ec2:DescribeInstances",
-        "ec2:AttachNetworkInterface"
-      ],
-      "Resource": "*"
-    }
-  ]
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:CreateNetworkInterface",
+                "ec2:DeleteNetworkInterface",
+                "ec2:DescribeNetworkInterfaces"
+            ],
+            "Resource": "*"
+        }
+    ]
 }
 ```
 
+![](assets/roles.png)
+
+
   - In the configurations tab of AWS Lambda, you can edit the VPC settings to establish a connection between Lambda and the RDS instance within a VPC. This allows Lambda to securely access the RDS instance. The resulting page will display the VPC configuration settings, as shown in the provided screenshot
 
-In Amazon Cognito's "cruddur-user-pool," configure a Lambda trigger for the "sign-up post confirmation" event. Assign the Lambda function "cruddur-post-confirmation" to the trigger. Delete the existing user to allow signing up again and verify if the user is inserted into the RDS instance's users table.
+
+![](/journal/vpc-lambda.png)
+
+
+In Amazon Cognito's `cruddur-user-pool`, configure a Lambda trigger for the sign-up post confirmation event. Assign the Lambda function `cruddur-post-confirmation` to the trigger. Delete the existing user to allow signing up again and verify if the user is inserted into the RDS instance's users table.
+
+
+![](assets/trigger.png)
+
+Run `docker compose up` and the following command `./bin/db-schema-load prod`, and `./bin/db-connect prod` to connect to the prod database.
+
+![](assets/prod-conn.png)
+
+To review the logs for the Lambda function "cruddur-post-confirmation" at CloudWatch, follow these steps:
+  - Access the CloudWatch service in the AWS Management Console.
+  - Navigate to `Log groups` and search for the log group named `/aws/lambda/cruddur-post-confirmation`.
+  - Click on the log group to view the logs associated with the Lambda function.
+
+![](assets/logs.png)
+
+
+### Activity Creation
+
+We worked on implementing the ability to create activities. These involved SQL statements for creating and retrieving activities, improvements in SQL query formatting and JSON handling, and updates to service methods for activity creation and retrieval
+
+Using this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/8b0181aa990855d8a49bf8112925304daa771d6b) and this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/542f655ced297b6d07658a7f2a689e098403a3f1), several changes were made to the files:
+
+  - `backend-flask/db/sql/activities/create.sql`: Added an SQL statement to insert a new activity into the `public.activities` table, including parameters for `handle`, `message`, and `expires_at`.
+  - `backend-flask/db/sql/activities/home.sql`: Added an SQL statement to retrieve a list of activities from the `public.activities` table, including joins with the `public.users` table and ordering by `created_at` in descending order.
+  - `backend-flask/db/sql/activities/object.sql`: Modified the SQL statement to retrieve a single activity from the `public.activities` table based on the provided `uuid`, including joins with the `public.users` table.
+  - `backend-flask/lib/db.py`: Added `query_wrap_object` and `query_wrap_array` methods to wrap SQL templates and return JSON objects or arrays, respectively. Updated existing methods to use the new wrapping functions.
+  - `backend-flask/services/create_activity.py`: Added the `CreateActivity` class with the `run` method. The `run` method creates a new activity by calling the `create_activity` method and returns a model containing the activity data.
+  - `backend-flask/services/home_activities.py`: Updated import statements and modified the `run` method to use the `db` object. Updated the SQL statement and removed print statements.
+  - `backend-flask/app.p`y: Updated the `data_activities` route to retrieve the `user_handle` from the request's JSON payload instead of using a hardcoded value.
+  - `frontend-react-js/src/components/ActivityForm.js`: Updated the `body` of the POST request to include the `user_handle` retrieved from the `props` instead of a hardcoded value.
+  - `frontend-react-js/src/pages/HomeFeedPage.js`: Updated the `ActivityForm` component's `user_handle` prop to be passed the `user` object instead of a specific property (`handle`).
+
+
+Run `docker compose up`, signin and create activities as shown bellow.
+
+![](assets/activity.png)
+
+To verify the data inserted into the `activities` table after creating activities, Run the command `./bin/db-connect prod` to connect to the production database.
+
+![](assets/create.png)
+
+### References
+
+  - AWS Documentation [link](https://docs.aws.amazon.com/)
+  - Postgres Official Documentation [link](https://www.postgresql.org/docs/)
+  - AWS Lambda Developer Guide [link](https://docs.aws.amazon.com/lambda/)
+
+
+
