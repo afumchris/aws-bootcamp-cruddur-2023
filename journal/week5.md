@@ -5,8 +5,8 @@
   - [Introduction](#introduction)
   - [Data Modelling](#data-modelling)
   - [Setting up DynamoDB Local](#setting-up-dynamodb-local)
-  - DynamoDB Utility Scripts
-  - Implement Conversations with DynamoDB Local
+  - [DynamoDB Utility Scripts](#dynamodb-utility-scripts)
+  - [Implement Conversations with DynamoDB Local](#implement-conversations-with-dynamodb-local)
   - Implement DynamoDB Stream with AWS Lambda
   - References
 
@@ -65,10 +65,44 @@ message = {
 
 ### Setting up DynamoDB Local
 
+### DynamoDB Utility Scripts
+
+Create the following utility scripts using this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/e2096e9a35e09418df10872e102855ea19041fb5) and this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/a062d274bd00347f92e668855212516cdb66a2af) to aid in managing and administering DynamoDB:
+
+  - `backend-flask/bin/ddb/schema-load`: creates a table named "cruddur-messages," either on DynamoDB local or on the AWS platform for prod.
+  - `backend-flask/bin/ddb/drop`: drops a DynamoDB table.
+  - `backend-flask/bin/ddb/list-tables`: lists DynamoDB tables created.
+  - `backend-flask/bin/ddb/patterns/get-conversation`: queries a DynamoDB table for a conversation.
+  - `backend-flask/bin/ddb/patterns/list-conversations`: list content related to querying a DynamoDB table for conversations.
+  - `backend-flask/bin/ddb/scan`: scans all items in a DynamoDB table.
+  - `backend-flask/bin/ddb/seed`: loads the seed data into the dynamoDB table.
+  - Modified the file `backend-flask/db/seed.sql` to include additional insert statements.
+  - Modified the file `backend-flask/lib/db.py` to add new functions and modify existing ones related to printing SQL statements, querying JSON objects, and querying a single value.
+
+
+schema-load and list-tables:
+
+![](assets/list-tables.png)
+
+seed data:
+
+![](assets/ddb-seed.png)
+
+scanning items:
+
+![](assets/ddb-scan.png)
+
+get-conversation:
+
+![](assets/get-conversation.png)
+
+list-conversations:
+
+![](assets/list-conversations.png)
 
 
 
-
+### Implement Conversations with DynamoDB Local
 
 
 
