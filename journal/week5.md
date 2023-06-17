@@ -72,9 +72,11 @@ export AWS_COGNITO_USER_POOL_ID="your AWS_COGNITO_USER_POOL_ID"
 gp env AWS_COGNITO_USER_POOL_ID="your AWS_COGNITO_USER_POOL_ID"
 ```
 
+Run `pip install -r requirements.txt` to install `boto3` locally, which is the AWS SDK for Python. Boto3 makes it easy to integrate your Python application, library, or script with AWS services including Amazon DynamoDB, and more.
+
 using this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/b54210c4c8a4a10a0e4b90ba61b57347f864b42b) make the following changes:
 
-  - `.gitpod.yml`: Added a new task named "flask" that changes the directory to "backend-flask" and installs the project dependencies by running pip install -r requirements.txt.
+  - `.gitpod.yml`: Added a new task named `flask` to install python libraries automatically at the launch of a new workspace environment.
   - `backend-flask/bin/cognito/list-users`: This script lists the users in the Cognito user pool associated with the application.
 It retrieves the AWS_COGNITO_USER_POOL_ID environment variable and uses the boto3 library to interact with Cognito.
 The script prints the list of users and creates a dictionary mapping the user handle to the Cognito sub (user identifier).
