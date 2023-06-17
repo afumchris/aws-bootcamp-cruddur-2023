@@ -134,5 +134,19 @@ list-conversations:
 
 ### Implement Conversations with DynamoDB Local
 
+Make the following changes as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/58109f3977e7095d6a8e30ee1eec6d240f38c808?diff=unified) to implement conversations with DynamoDB Local.
 
+Run `docker compose up`, `./bin/db/setup` to setup local database `cruddur`, `./bin/ddb/schema-load` to create `cruddur-messages` table and `./bin/ddb/seed` to seed data into the table.
+
+Check the frontend `url`  and append the group `uuid` for filler message as shown below:
+
+![](assets/group-uuid.png)
+
+Append `/messages/new/londo` to create and update new messages in a new message group with londo
+
+![](assets/new-londo.png)
+
+Append `/messages/new/bayko` to create and update new messages in a new message group with bayko
+
+![](assets/new-bayko.png)
 
