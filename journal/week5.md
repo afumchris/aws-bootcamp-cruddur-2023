@@ -65,6 +65,34 @@ message = {
 
 ### Setting up DynamoDB Local
 
+Set `AWS_COGNITO_USER_POOL_ID` as enviroment variable using this command:
+
+```sh
+export AWS_COGNITO_USER_POOL_ID="your AWS_COGNITO_USER_POOL_ID"
+gp env AWS_COGNITO_USER_POOL_ID="your AWS_COGNITO_USER_POOL_ID"
+```
+
+using this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/b54210c4c8a4a10a0e4b90ba61b57347f864b42b) make the following changes:
+
+  - `.gitpod.yml`: Added a new task named "flask" that changes the directory to "backend-flask" and installs the project dependencies by running pip install -r requirements.txt.
+  - `backend-flask/bin/cognito/list-users`: This script lists the users in the Cognito user pool associated with the application.
+It retrieves the AWS_COGNITO_USER_POOL_ID environment variable and uses the boto3 library to interact with Cognito.
+The script prints the list of users and creates a dictionary mapping the user handle to the Cognito sub (user identifier).
+  - `backend-flask/bin/db/setup`: modified it to run a Python script `update_cognito_user_ids` to update the Cognito user IDs in the database.
+  - `backend-flask/bin/db/update_cognito_user_ids`: This Python script updates the Cognito user IDs in the database for existing users.
+  - `backend-flask/db/seed.sql`: Modified the script to add another user.
+  - `docker-compose.yml`: Updated the CONNECTION_URL environment variable for the backend-flask service to use the specified PostgreSQL connection URL.
+
+Run `docker compose up` with the following commands as shown in the screenshot below for confirmation:
+
+![](/journal/dynamodb-local.png)
+
+![](assets/list-users.png)
+
+
+
+
+
 ### DynamoDB Utility Scripts
 
 Create the following utility scripts using this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/e2096e9a35e09418df10872e102855ea19041fb5) and this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/a062d274bd00347f92e668855212516cdb66a2af) to aid in managing and administering DynamoDB:
