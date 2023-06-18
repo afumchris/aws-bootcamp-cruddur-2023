@@ -7,8 +7,8 @@
   - [Setting up DynamoDB Local](#setting-up-dynamodb-local)
   - [DynamoDB Utility Scripts](#dynamodb-utility-scripts)
   - [Implement Conversations with DynamoDB Local](#implement-conversations-with-dynamodb-local)
-  - Implement DynamoDB Stream with AWS Lambda
-  - References
+  - [Implement DynamoDB Stream with AWS Lambda](#implement-dynamodb-stream-with-aws-lambda)
+  - [References](#references)
 
 ### Introduction
 
@@ -149,4 +149,56 @@ Append `/messages/new/londo` to create and update new messages in a new message 
 Append `/messages/new/bayko` to create and update new messages in a new message group with bayko
 
 ![](assets/new-bayko.png)
+
+
+### Implement DynamoDB Stream with AWS Lambda
+
+This [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/309d0d961d95c4bfca95f46b58bbadb6dc65dcd5) outlines the changes made to integrate DynamoDB Stream processing and perform schema modifications in the project. Files modified:
+
+Files Modified:
+
+  - `aws/lambdas/cruddur-messaging-stream.py`: Added a Lambda function to handle DynamoDB Stream events and update related records in the cruddur-messages table.
+  - `aws/policies/cruddur-message-stream-policy.json`: Created an AWS IAM policy to grant necessary permissions for the Lambda function to access DynamoDB.
+  - `backend-flask/bin/ddb/schema-load`: Updated the schema definition to include a new table, cruddur-messages, and a global secondary index, message-group-sk-index.
+  - `docker-compose.yml`: Modified the environment variable AWS_ENDPOINT_URL to point to the actual DynamoDB endpoint instead of the local development endpoint
+
+Run `docker compose up`, `./bin/db/setup` and `./bin/ddb/schema-load prod` to create DynamoDB table called `cruddur-messages` on the AWS console.
+
+To configure the necessary components on AWS for the "cruddur-messages" table, follow these steps:
+
+  - DynamoDB:
+    - Navigate to the DynamoDB service in the AWS Management Console.
+    - Open the `cruddur-messages` table.
+    - Enable DynamoDB Streams for the table.
+    - Select the `New image` option to capture the entire item image in the stream.
+  - VPC:
+    - Access the VPC console in the AWS Management Console.
+    - Create an endpoint called `cruddur-ddb` for the DynamoDB service.
+    - Choose the default VPC and route table for the endpoint configuration.
+    - Grant full access for custom policy
+  - Lambda:
+    - Open the Lambda console in the AWS Management Console.
+    - Create a new Lambda function named `cruddur-messaging-stream`.
+    - In the advanced settings, enable VPC for the Lambda function and associate it with the desired VPC, subnet group and security group
+    - Deploy the code found in the file `aws/lambdas/cruddur-messaging-stream.py` for the function's implementation.
+    - Add the `AWSLambdaInvocation-DynamoDB` permission to the Lambda IAM role.
+    - create inline policies for additional permissions using the JSON file `aws/policies/cruddur-message-stream-policy.json`.
+  - DynamoDB Trigger:
+    - Return to the DynamoDB console.
+    - Configure a new trigger for the `cruddur-messages` table.
+    - Select 1 for batch size
+    - Select the `cruddur-messaging-stream` Lambda function as the trigger.
+
+Run `docker compose up`, open the frontend `url` and append `/meesages/new/londo` or  `/meesages/new/bayko` to create new messages:
+
+![](assets/ddb-stream.png)
+
+If the configuration is successful and there are no errors, you should not observe any errors in the CloudWatch logs. You can verify this by checking the CloudWatch service and navigating to the Log Groups section. Look for the log group named `/aws/lambda/cruddur-messaging-stream` as shown in the provided screenshots. 
+
+![](assets/ddb-cloudwatchlogs.png)
+
+
+### References
+
+  - AWS DynamoDB Documentation [link](https://docs.aws.amazon.com/dynamodb/index.html)
 
