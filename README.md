@@ -23,7 +23,7 @@ The `/journal` directory contains
 - [ ] [Week 3](journal/week3.md)
 - [ ] [Week 4](journal/week4.md)
 - [ ] [Week 5](journal/week5.md)
-- [ ] [Week 6](journal/week6.md)
+- [ ] [Week 6](journal/week6-7.md)
 - [ ] [Week 7](journal/week7.md)
 - [ ] [Week 8](journal/week8.md)
 - [ ] [Week 9](journal/week9.md)
