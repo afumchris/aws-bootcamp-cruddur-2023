@@ -2,11 +2,11 @@
 
 ## Table of Contents:
 
-  - Introduction
-  - Health Check 
-  - ECS Cluster and ECR Repository
-  - Launching Containers on ECS
-  - Application Load Balancer
+  - [Introduction](#introduction)
+  - [Health Check](#health-check) 
+  - [ECS Cluster and ECR Repository](#ecs-cluster-and-ecr-repository)
+  - [Launching Containers on ECS](#launching-containers-on-ecs)
+  - [Application Load Balancer](#application-load-balancer)
   - Custom Domain Configuration
   - Securing Backend Flask
 
@@ -23,7 +23,7 @@ health check involves evaluating various aspects of the application to ensure it
   - create a test script and make it executable `backend-flask/bin/db/test` as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/97fbe8a7f0f31fe7d8589afd7c7985a0c822fdaf#diff-fbf3b7a44dbc91b3e8d181ab9bb8a8c92c3e76840879fa7e8e636b917603c521)
   - fix `update-sg-rule` file path in `.gitpod.yml` file as seeen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/97fbe8a7f0f31fe7d8589afd7c7985a0c822fdaf#diff-370a022e48cb18faf98122794ffc5ce775b2606b09a9d1f80b71333425ec078e)
 
-Manually run the command `export GITPOD_IP=$(curl ifconfig.me)` in the top directory, then navigate to the "backend-flask" directory and execute `./bin/rds/update-sg-rule` to update the security group. After that, run `./bin/db/test` to confirm the connection status. If everything is successful, you should see the expected message as shown in the screenshot below.
+Manually run the command `export GITPOD_IP=$(curl ifconfig.me)` in the top directory, then navigate to the `backend-flask` directory and execute `./bin/rds/update-sg-rule` to update the security group. After that, run `./bin/db/test` to confirm the connection status. If everything is successful, you should see the expected message as shown in the screenshot below.
 
 ![](assets/test.png)
 
@@ -153,7 +153,7 @@ docker push $ECR_BACKEND_FLASK_URL:latest
 ##### Frontend-react-js
 
 
-
+Go to the AWS Management Console and access AWS ECR (Elastic Container Registry). Navigate to the Repositories section to confirm if the images were created successfully and are visible in the registry.
 
 ### Launching Containers on ECS
 Deploy the containers onto the ECS cluster, utilizing the container images stored in the ECR repository.
@@ -171,6 +171,8 @@ aws ssm put-parameter --type "SecureString" --name "/cruddur/backend-flask/OTEL_
 ```
 
 Navigate to the AWS Management Console and select AWS Systems Manager. From there, access the Parameter Store to ensure that the values were accurately set.
+
+![](assets/parameter-store.png)
 
 Based on the provided commits, create separate files holding the AWS policies for the `CruddurServiceExecutionRole` [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/97fbe8a7f0f31fe7d8589afd7c7985a0c822fdaf#diff-140ff34ff4760d0e7e2c4fbf70b1c1d07b7ac054bb074512615f53f6f03f3398) and `CruddurServiceExecutionPolicy` [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/97fbe8a7f0f31fe7d8589afd7c7985a0c822fdaf#diff-d48147539acff3a143fc19696e28187238e9a56bf6788bcd816a34572897a6f6). Then, proceed to establish the ExecutionRole and associate the policies using the provided commands:
 
@@ -250,6 +252,8 @@ ws ecs register-task-definition --cli-input-json file://aws/task-definitions/bac
 
 Navigate to the AWS Management Console and go to AWS ECS (Elastic Container Service). Check the Task Definitions section to verify if the task definition has been successfully created in the console.
 
+![](assets/task-definition-backend-flask.png)
+
 ##### Security Group for Backend-flask Service
 
 To obtain the DEFAULT_VPC_ID and DEFAULT_SUBNET_IDS required for creating a security group named `crud-srv-sg` with inbound rules for port `4567`, you can use the following AWS CLI commands:
@@ -285,4 +289,92 @@ aws ec2 authorize-security-group-ingress \
   --cidr 0.0.0.0/0
 ```
 
-##### Create ECS Cluster service for Backend-flask
+Navigate to the AWS Management Console and select EC2 (Elastic Compute Cloud). Go to the Security Groups section to confirm if the security group, `crud-srv-sg`, was created successfully and if the inbound rules for port `4567` were set accordingly.
+
+##### Create ECS Cluster Service for Backend-flask
+
+using this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/97fbe8a7f0f31fe7d8589afd7c7985a0c822fdaf#diff-a2eea4c74369eeb48e7b10271b7e8b62e4487c546a362ab3367656b4ed299099), create file in `aws/json/service-backend-flask`. Be sure to modify the security group id and subnets in the file to match those of your AWS account.
+
+Execute this command to create a service:
+```sh
+aws ecs create-service --cli-input-json file://aws/json/service-backend-flask.json
+```
+
+In the AWS Management Console, navigate to ECS (Elastic Container Service) clusters. Locate the backend service and access the Service tab to verify if the service is running. Additionally, check the health check status to ensure that it is showing as healthy.
+
+![](assets/healthy-backend-flask.png)
+
+
+###### Connect to the backend-flask container by utilizing AWS Systems Manager Session Manager.
+
+As seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/97fbe8a7f0f31fe7d8589afd7c7985a0c822fdaf#diff-5e69de896a2f2b06791ac316dc95f94b7e0e3313e2fb66f80d2c367a215fa545) create a new file `backend-flask/bin/ecs/connect-to-service` and make it executable.
+
+Install Sessions Manager plugin for Linux and access the ECS cluster via the CLI with the following commands:
+
+```sh
+curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
+
+sudo dpkg -i session-manager-plugin.deb
+```
+
+To verify that it was successfully installed, run:  `session-manager-plugin`
+
+Based on the provided [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/97fbe8a7f0f31fe7d8589afd7c7985a0c822fdaf#diff-370a022e48cb18faf98122794ffc5ce775b2606b09a9d1f80b71333425ec078e), make the necessary modifications to the `.gitpod.yml` file to ensure that AWS Systems Manager Session Manager is installed every time the environment is launched.
+
+To connect to the container, execute the following command in the terminal:
+
+```sh
+./bin/ecs/connect-to-backend-service <task ARN ID>
+```
+
+Edit the inbound rule of the RDS instance security group to grants access to the `crud-srv-sg` security group, then run `./bin/db/test` to test RDS connection.
+
+![](assets/service-test-connection.png)
+
+
+### Application Load Balancer
+
+To provision and configure an Application Load Balancer (ALB) and target groups via the AWS console, follow these steps:
+
+  - Access the AWS Management Console and navigate to the EC2 service.
+  - Choose "Load Balancers" from the sidebar menu and click on the "Create Load Balancer" button.
+  - Configure the basic settings as follows:
+    - Name: cruddur-alb
+    - Scheme: Internet-facing
+    - IP address type: IPv4
+  - Configure the network mapping:
+    - Choose the default VPC.
+    - Select all availability zones.
+  - Set up the security groups:
+    - Create a new security group named cruddur-alb-sg.
+  - Configure inbound rules as follows:
+    - HTTP and HTTPS from anywhere.
+    - Custom TCP rules for ports 4567 and 3000 from anywhere.
+  - Edit the inbound rules of the security group crud-srv-sg:
+    - Set the port source from cruddur-alb-sg.
+    - Set the description of port 4567 as ALBbackend and port 3000 as ALBfrontend.
+  - Configure listeners and routing:
+    - Create an HTTP listener on port 4567 and associate it with a new target group named cruddur-backend-flask-tg.
+    - Set the target type as IP addresses.
+    - Configure the health check path as /api/health-check with a healthy threshold of 3.
+    - Get the ARN of this target group to use in the aws/json/service-backend-flask.json file.
+    - Add another HTTP listener on port 3000 and associate it with a new target group named cruddur-frontend-react-js.
+    - No need to configure a health check for this target group.
+    - Set the healthy threshold to 3.
+    - Get the ARN of this target group to use in the aws/json/service-frontend-react-js.json file.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
