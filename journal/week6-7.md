@@ -158,7 +158,7 @@ To build and push the frontend-react-js image to ECR (Elastic Container Registry
   - Create a new file `nginx.conf` as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/1adf9b98720da1d75afb19ef824ba1d95604fc2e#diff-a6d1efa5086699305a622c303320902e92f271d483b71a873513d29c7222269e)
   - Modify `frontend-react-js/src/pages/ConfirmationPage.js` and `frontend-react-js/src/pages/RecoverPage.js` files to fix cognito errors using this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/cdb6c46e97788cb9dc4c4699c98414d90c7bf501#diff-5cc5825850403ee1325a55220cdf3d9b19fe2efb228ad6458516c3eb45838349) and this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/cdb6c46e97788cb9dc4c4699c98414d90c7bf501#diff-1fd5e87231653eb3d24b789918f2743c9702c7fea73d01afb8ea19c8c4062543)
   - Change into the frontend directory and run `npm run build`
-  - Build image locally with the following command:
+  - Build image with the following command:
 
 ```sh
 docker build \
@@ -196,6 +196,16 @@ docker tag frontend-react-js:latest $ECR_FRONTEND_REACT_URL:latest
 ```sh
 docker push $ECR_FRONTEND_REACT_URL:latest
 ```
+
+###### Test the frontend-react-js image locally by running the following command:
+```sh
+docker compose up backend-flask db
+
+docker run --rm -p 3000:3000 -it frontend-react-js
+```
+
+![](assets/test-frontend-locally.png)
+
 
 Go to the AWS Management Console and access AWS ECR (Elastic Container Registry). Navigate to the Repositories section to confirm if the images were created successfully and are visible in the registry.
 
@@ -291,7 +301,7 @@ Using the provided [commit](https://github.com/afumchris/aws-bootcamp-cruddur-20
 
 ##### Register Task Definition for Backend-flask:
 ```sh
-ws ecs register-task-definition --cli-input-json file://aws/task-definitions/backend-flask.json
+aws ecs register-task-definition --cli-input-json file://aws/task-definitions/backend-flask.json
 ```
 
 Navigate to the AWS Management Console and go to AWS ECS (Elastic Container Service). Check the Task Definitions section to verify if the task definition has been successfully created in the console.
@@ -415,6 +425,8 @@ To provision and configure an Application Load Balancer (ALB) and target groups 
     - Set the healthy threshold to 3.
     - Get the ARN of this target group to use in the aws/json/service-frontend-react-js.json file.
 
+#### Intergrate ALB with backend-flask
+
 Modify `aws/json/service-backend-flask` file to use the ALB you just created as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/732daa60d14c9f31e9b7f6750f440d809b09c1b5#diff-a2eea4c74369eeb48e7b10271b7e8b62e4487c546a362ab3367656b4ed299099)
 
 To provision the backend-flask service again, execute the following command:
@@ -426,6 +438,7 @@ aws ecs create-service --cli-input-json file://aws/json/service-backend-flask.js
 In the AWS Management Console, navigate to ECS (Elastic Container Service) clusters. Locate the backend service and access the Service tab to verify if the service is running. Additionally, check the service health check status and the backend-flask target group to ensure that it is showing as healthy.
 
 
+#### Intergrate ALB with frontend-react-js
 
 
 
