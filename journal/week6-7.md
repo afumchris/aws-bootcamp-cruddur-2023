@@ -8,7 +8,7 @@
   - [Launching Containers on ECS](#launching-containers-on-ecs)
   - [Application Load Balancer](#application-load-balancer)
   - [Custom Domain Configuration](#custom-domain-configuration)
-  - Securing Backend Flask
+  - [Securing Backend Flask](#securing-backend-flask)
 
 ### Introduction
 
@@ -530,9 +530,125 @@ I registered the domain name `adikaifeanyi.com` for this bootcamp using Namechea
     - Set the routing policy as simple routing.
     - Repeat the above step for the record name `api.adikaifeanyi.com`.
 
+To get domain name working, update task definition for `backend-flask` and rebuild the `frontend-react-js image`
 
+#### Update task definition for backend-flask
 
+Modify `aws/task-definitions/backend-flask.json` file as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/80956c6d1a0020eee6f2d1b53159a0cc45f9de02) to use the right environment variable.
 
+#### Register Task Definition for Backend-flask:
+```sh
+aws ecs register-task-definition --cli-input-json file://aws/task-definitions/backend-flask.json
+```
+
+#### Rebuild the frontend-react-js
+
+###### ECR Login:
+```sh
+aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
+```
+
+###### Set URL:
+```sh
+export ECR_FRONTEND_REACT_URL="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/frontend-react-js"
+echo $ECR_FRONTEND_REACT_URL
+```
+
+###### Build image:
+```sh
+cd frontend-react-js/
+
+docker build \
+--build-arg REACT_APP_BACKEND_URL="https://api.adikaifeanyi.com" \
+--build-arg REACT_APP_AWS_PROJECT_REGION="$AWS_DEFAULT_REGION" \
+--build-arg REACT_APP_AWS_COGNITO_REGION="$AWS_DEFAULT_REGION" \
+--build-arg REACT_APP_AWS_USER_POOLS_ID="your_REACT_APP_AWS_USER_POOLS_ID" \
+--build-arg REACT_APP_CLIENT_ID="your_REACT_APP_CLIENT_ID" \
+-t frontend-react-js \
+-f Dockerfile.prod \
+.
+```
+
+###### Tag Image:
+```sh
+docker tag frontend-react-js:latest $ECR_FRONTEND_REACT_URL:latest
+```
+
+###### Push Image:
+```sh
+docker push $ECR_FRONTEND_REACT_URL:latest
+```
+
+update the Backend-Flask and Frontend-React-JS services in Amazon Elastic Container Service (ECS) to force a new deployment with the latest configurations by following these steps:
+
+ - For Backend-Flask Service:
+    - Access the AWS Management Console and navigate to the ECS service.
+    - Choose the cluster that contains the Backend-Flask service.
+    - Select the Backend-Flask service from the list.
+    - In the service details page, click on the "Update" button.
+    - Check the box for "Force new deployment"
+    - For Revision select LATEST
+    - Review the changes and click on the "Update" button to initiate the update process.
+ - For Frontend-React-JS Service:
+    - Select the Frontend-react-js service from the list.
+    - In the service details page, click on the "Update" button.
+    - Check the box for "Force new deployment"
+    - For Revision select LATEST
+    - Review the changes and click on the "Update" button to initiate the update process.
+
+In the AWS Management Console, navigate to ECS (Elastic Container Service) clusters. Locate the frontend and backend service, access each Service tab to verify if the services are running. Additionally, check the service health check status and the frontend and backend target group to ensure that it is showing as healthy. Type adikaifeanyi.com and you should see this:
+
+![](assets/domain-name-working.png)
+
+### Securing Backend-Flask
+
+To ensure the security, performance, and stability of your production environment, it is recommended to disable development servers and built-in debuggers. Instead, employ proper logging and monitoring practices to capture relevant information for troubleshooting purposes while keeping your production environment secure and optimized. 
+
+Modify `backend-flask/Dockerfile` to include debug flag as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/2ac24522de1463a4f8600f96399647079d8e3ece#diff-6f2b9638ec8f4b5a82a7ad3dce05eb963109f5a50c83a9aa342ae6dc0e5f374e)
+
+Create a new file `backend-flask/Dockerfile.prod` that includes no-debug, no-debugger and no-reload as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/2ac24522de1463a4f8600f96399647079d8e3ece#diff-6d225ea023d504cad1c7455b5e118da68be678d3e13b7df2a8abe8889610f50a) 
+
+###### ECR Login:
+```sh
+aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
+```
+
+###### Build Image:
+```sh
+cd backend-flask/
+
+docker build -f Dockerfile.prod -t backend-flask-prod .
+```
+
+###### Run backend-flask-prod
+
+Create a new file `backend-flask/bin/docker/run/backend-flask-prod` as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/2ac24522de1463a4f8600f96399647079d8e3ece#diff-8709e643d59662601107d3c29f25754eba799bb50b7a2ab9d6065f09f2407123), make the file executable and run it with this command:
+```sh
+./bin/docker/run/backend-flask-prod
+```
+
+###### Set URL:
+```sh
+export ECR_BACKEND_FLASK_URL="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/backend-flask"
+echo $ECR_BACKEND_FLASK_URL
+```
+
+###### Tag Image:
+```sh
+docker tag backend-flask:latest $ECR_BACKEND_FLASK_URL:latest
+```
+
+###### Push Image:
+```sh
+docker push $ECR_BACKEND_FLASK_URL:latest
+```
+
+###### Force deploy backend-flask
+
+create a new file `backend-flask/bin/ecs/force-deploy-backend-flask` as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/2ac24522de1463a4f8600f96399647079d8e3ece#diff-26a0dc79660877ef3d645d3f1b5db4fe6a67d029cffbe76e7f4b82293228b97d), make the file executable and run it with this command:
+```sh
+./bin/ecs/force-deploy-backend-flask
+```
 
 
 
