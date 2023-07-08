@@ -7,7 +7,7 @@
   - [ECS Cluster and ECR Repository](#ecs-cluster-and-ecr-repository)
   - [Launching Containers on ECS](#launching-containers-on-ecs)
   - [Application Load Balancer](#application-load-balancer)
-  - Custom Domain Configuration
+  - [Custom Domain Configuration](#custom-domain-configuration)
   - Securing Backend Flask
 
 ### Introduction
@@ -152,7 +152,7 @@ docker push $ECR_BACKEND_FLASK_URL:latest
 
 ##### Frontend-react-js
 
-To build and push the frontend-react-js image to ECR (Elastic Container Registry), follow these steps for a two-build-step process for the frontend-react-js Dockerfile:
+To build and push the frontend-react-js image to ECR (Elastic Container Registry), follow these steps for a two-build-step process:
 
   - Create a new file `Dockerfile.prod` for frontend-react-js as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/cdb6c46e97788cb9dc4c4699c98414d90c7bf501#diff-7c2adaca3e31bca71bdaf16d8980ce69b0f8125cbfddaf9d36f58ca7ef3e799b)
   - Create a new file `nginx.conf` as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/1adf9b98720da1d75afb19ef824ba1d95604fc2e#diff-a6d1efa5086699305a622c303320902e92f271d483b71a873513d29c7222269e)
@@ -394,6 +394,10 @@ Using the provided [commit](https://github.com/afumchris/aws-bootcamp-cruddur-20
 aws ecs register-task-definition --cli-input-json file://aws/task-definitions/frontend-react-js.json
 ```
 
+Navigate to the AWS Management Console and go to AWS ECS (Elastic Container Service). Check the Task Definitions section to verify if the task definition has been successfully created in the console.
+
+![](assets/frontend-task-definition.png)
+
 ### Application Load Balancer
 
 To provision and configure an Application Load Balancer (ALB) and target groups via the AWS console, follow these steps:
@@ -439,6 +443,93 @@ In the AWS Management Console, navigate to ECS (Elastic Container Service) clust
 
 
 #### Intergrate ALB with frontend-react-js
+
+Create a new file `aws/json/service-frontend-react-js.json` as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/732daa60d14c9f31e9b7f6750f440d809b09c1b5#diff-e6843ade525f0a7ca02583ea7f8310878228cb53977ad3c62dfa7e16a7f8b67e)
+
+Rebuild the frontend-react-js image to utilize the ALB (Application Load Balancer) as the backend_url by following these steps, also make sure you are in the frontend-react-js directory before running these commands:
+
+###### Build Image:
+
+```sh
+docker build \
+--build-arg REACT_APP_BACKEND_URL="http://your_Load_Balancer_DNS_Host_Name" \
+--build-arg REACT_APP_AWS_PROJECT_REGION="$AWS_DEFAULT_REGION" \
+--build-arg REACT_APP_AWS_COGNITO_REGION="$AWS_DEFAULT_REGION" \
+--build-arg REACT_APP_AWS_USER_POOLS_ID="your_REACT_APP_AWS_USER_POOLS_ID" \
+--build-arg REACT_APP_CLIENT_ID="your_REACT_APP_CLIENT_ID" \
+-t frontend-react-js \
+-f Dockerfile.prod \
+.
+```
+
+###### Tag Image:
+```sh
+docker tag frontend-react-js:latest $ECR_FRONTEND_REACT_URL:latest
+```
+
+###### Push Image:
+```sh
+docker push $ECR_FRONTEND_REACT_URL:latest
+```
+
+Edit the `crud-srv-sg` security group on the AWS Management Console to allow inbound traffic on port 3000 from the ALB (Application Load Balancer) security group by following these steps:
+
+  - Open the AWS Management Console and navigate to the EC2 service.
+  - Select Security Groups from the sidebar menu.
+  - Locate the `crud-srv-sg` security group to edit and click on its ID or name.
+  - In the Inbound Rules tab, click on the Edit inbound rules button.
+  - Add a new inbound rule by clicking on "Add rule".
+  - Set the following configurations for the inbound rule:
+     - Type: Custom TCP
+     - Port Range: 3000
+     - Source: Select "Custom" and enter the security group ID of the ALB security group.
+ - Click on the "Save rules" or "Apply" button to apply the changes.
+
+Execute this command to create a service:
+```sh
+cd ..
+
+aws ecs create-service --cli-input-json file://aws/json/service-frontend-react-js.json
+```
+
+In the AWS Management Console, navigate to ECS (Elastic Container Service) clusters. Locate the frontend service and access the Service tab to verify if the service is running. Additionally, check the service health check status and the frontend target group to ensure that it is showing as healthy.
+
+![](assets/frontend-healthy-container.png)
+
+Navigate to the ALB (Application Load Balancer) tab in the AWS Management Console. Copy the DNS hostname associated with the ALB and paste it into your web browser. Append `:3000` to the hostname and hit Enter. You should now be able to view the frontend application with the corresponding data as shown below
+
+![](assets/alb-dns-name.png)
+
+
+### Custom Domain Configuration
+
+I registered the domain name `adikaifeanyi.com` for this bootcamp using Namecheap. To manage the `adikaifeanyi.com` domain and configure the necessary settings, follow these steps:
+
+ - Configure Hosted Zone:
+    - Access Route 53 > Hosted zones in the AWS Management Console.
+    - Create a new hosted zone for `adikaifeanyi.com` with the "public" type.
+    - Copy the provided NS record values.
+    - Update the nameservers in the Namecheap DNS settings.
+ - Request SSL Certificate:
+    - Go to Certificate Manager (ACM).
+    - Request a public certificate.
+    - Add the domain names `adikaifeanyi.com` and `*.adikaifeanyi.com`.
+    - Once the certificate is issued, select it.
+    - Click "Create records in Route 53" to generate two CNAME records in Route 53.
+ - Configure Load Balancers:
+    - Access Load Balancers in the AWS Management Console.
+    - Add a listener to redirect HTTP (port 80) to HTTPS (port 443).
+    - Create another listener for HTTPS (port 443) and forward traffic to `frontend-react-js` using the SSL certificate.
+    - Edit the rules for HTTPS (port 443) to include a condition that sets the Host Header as `api.adikaifeanyi.com` and forwards traffic to the `backend-flask` target group.
+ - Set up Record Sets:
+    - Navigate to the hosted zone for `adikaifeanyi.com` in Route 53.
+    - Create a record set without a specific record name.
+    - Set the type as "A - Route Traffic to an IPv4 address and some AWS resources".
+    - Choose "Alias to Application and Classic Load Balancer" as the routing target.
+    - Specify the correct region and load balancer.
+    - Set the routing policy as simple routing.
+    - Repeat the above step for the record name `api.adikaifeanyi.com`.
+
 
 
 
