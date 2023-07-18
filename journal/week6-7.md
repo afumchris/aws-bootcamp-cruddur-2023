@@ -12,7 +12,7 @@
 
 ### Introduction
 
-Week 6/7 objectives revolved around deploying containers on ECS (Elastic Container Service), hosting container images on ECR (Elastic Container Registry), addressing CORS (Cross-Origin Resource Sharing) challenges using a load balancer, and configuring a custom domain. 
+Week 6/7 objectives revolved around deploying containers on ECS (Elastic Container Service) using Fargate, hosting container images on ECR (Elastic Container Registry), addressing CORS (Cross-Origin Resource Sharing) challenges using a load balancer, and configuring a custom domain. 
 
 ### Health Check
 
@@ -31,10 +31,6 @@ Manually run the command `export GITPOD_IP=$(curl ifconfig.me)` in the top direc
 
   - Modify the `app.py` file with health check endpoint for flask app as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/97fbe8a7f0f31fe7d8589afd7c7985a0c822fdaf#diff-0014cc1f7ffd53e63ff797f0f2925a994fbd6797480d9ca5bbc5dc65f1b56438)
   - Create a health-check script and make it executable `backend-flask/bin/flask/health-check` as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/97fbe8a7f0f31fe7d8589afd7c7985a0c822fdaf#diff-01d7ad6d634a3ec30374d54f33e9e024f562ff3eca15fdea99bb1119f41de4be)
-
-Make sure you are in the backend-flask directory then run `./bin/flask/health-check`, you should get the following response as seen below
-
-![]()
 
 ### ECS Cluster and ECR Repository
 
@@ -618,13 +614,6 @@ aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --usernam
 cd backend-flask/
 
 docker build -f Dockerfile.prod -t backend-flask-prod .
-```
-
-###### Run backend-flask-prod
-
-Create a new file `backend-flask/bin/docker/run/backend-flask-prod` as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/2ac24522de1463a4f8600f96399647079d8e3ece#diff-8709e643d59662601107d3c29f25754eba799bb50b7a2ab9d6065f09f2407123), make the file executable and run it with this command:
-```sh
-./bin/docker/run/backend-flask-prod
 ```
 
 ###### Set URL:
