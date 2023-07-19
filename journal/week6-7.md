@@ -9,6 +9,7 @@
   - [Application Load Balancer](#application-load-balancer)
   - [Custom Domain Configuration](#custom-domain-configuration)
   - [Securing Backend Flask](#securing-backend-flask)
+  - [Dynamodb Working in Production](#dynamodb-working-in-production)
 
 ### Introduction
 
@@ -632,16 +633,52 @@ docker tag backend-flask:latest $ECR_BACKEND_FLASK_URL:latest
 docker push $ECR_BACKEND_FLASK_URL:latest
 ```
 
-###### Force deploy backend-flask
+###### Force deploy backend-flask:
 
 create a new file `backend-flask/bin/ecs/force-deploy-backend-flask` as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/2ac24522de1463a4f8600f96399647079d8e3ece#diff-26a0dc79660877ef3d645d3f1b5db4fe6a67d029cffbe76e7f4b82293228b97d), make the file executable and run it with this command:
+
 ```sh
 ./bin/ecs/force-deploy-backend-flask
 ```
 
+### Dynamodb Working in Production
 
+In this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/553c4cc299d691883f72000aa0f11dce3cd8051c?diff=unified#diff-4d4413b1b6b19e2bba84add763693470bf0abf242e3395c156c7b2a3a63b5ba1), the query_object_json method in the `backend-flask/lib/db.py` file was updated. The modifications involved improving the error handling and returning a default JSON object ({}) when there is no result.
 
+After making changes to the `backend-flask/lib/db.py` file, the next step is to build the backend image incorporating these modifications and push it to the production environment.
 
+###### Build Image:
+
+Create a `bin/backend/build` script as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/553c4cc299d691883f72000aa0f11dce3cd8051c?diff=unified#diff-5c69cef29f6005f929be402365eff3f8afb9df2ffa21186d83ac374ce79a4a5e) and execute it with the following command `./bin/backend/build`.
+
+###### Push Image:
+
+Create a `backend-flask/bin/docker/push/backend-flask-prod` script as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/2ac24522de1463a4f8600f96399647079d8e3ece#diff-5dcb7ec0fb453e459233265529b912a136f7859b2dd66aeac6e0e76dc19594ab), move the script to the `bin/backend` directory and rename it `push` as seen [here](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/553c4cc299d691883f72000aa0f11dce3cd8051c#diff-e413f1d0638e188c8ef81bf77f508dc58f2fa6361385e47702c7493bedd4e1e0), then execute it with the following `./bin/backend/push`.
+
+###### Deploy backend-flask:
+
+Move `backend-flask/bin/ecs/force-deploy-backend-flask` script to `bin/backend/` directory and rename it `deploy` as seen [here](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/553c4cc299d691883f72000aa0f11dce3cd8051c#diff-e413f1d0638e188c8ef81bf77f508dc58f2fa6361385e47702c7493bedd4e1e0), then execute it with the following `bin/backend/deploy`.
+
+#### confirm messaging
+
+Insert mock user into RDS to confirm messaging using the provided commands: 
+
+  - create a script `backend-flask/bin/ecs/connect-to-backend-flask` as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/2e9d45da6d48fce736e2e87f41f23b7d1aa20d5c#diff-c89114d659d4870396f74ced4412c446f37288ba3b8d1f7b3e772f3b4fe4b4e4), move the script to `/bin/db/` directory and rename it `connect` as seen [here](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/553c4cc299d691883f72000aa0f11dce3cd8051c#diff-08c4aa961dff47eb9dc62d4ff67b06e16960ec2a77fd0314d14573170c96992e), then run the command `./bin/db/connect prod` to connect to the production database.
+  - Enable expanded output mode by entering `\x` on.
+  - Execute the command `select * from users;` to view the existing users.
+  - Use the following command to insert the mock user into the users table:
+
+```
+INSERT INTO public.users (display_name, email, handle, cognito_user_id)
+VALUES
+  ('Londo Mollari','lmollari@centari.com' ,'londo' ,'MOCK');
+```
+
+  - Execute the command `select * from users;` again to verify that the mock user has been successfully inserted. To exit the database connection, type `\q`.
+
+To verify if messaging is working, visit your dormain name and you should be able to send a message as shown below
+
+![](assets/messaging-working.png)
 
 
 
