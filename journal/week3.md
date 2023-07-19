@@ -7,7 +7,7 @@
 - [Installation and Configuration of AWS Amplify](#installation-and-configuration-of-aws-amplify)
 - [Implementing API Calls to Amazon Cognito for Custom Signup Signin Confirmation and Recovery Pages](#implementing-api-calls-to-amazon-cognito-for-custom-signup-signin-confirmation-and-recovery-pages)
 - [Server-Side Verification of JWT](#server-side-verification-of-jwt)
-- [Fix Expiring Token](fix-expiring-token)
+- [Fix Expiring Token](#fix-expiring-token)
 - [References](#references)
 
 ### Introduction
