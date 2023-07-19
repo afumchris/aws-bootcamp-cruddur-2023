@@ -17,9 +17,7 @@ This week, we explored the implementation of DynamoDB, a fully managed NoSQL dat
 
 ### Data Modelling
 
-In this particular scenario, we employ the Single Table Design approach to store all related data. By adopting this technique, we can achieve efficient and reliable data retrieval. Storing similar items within the same table also helps to simplify the application's complexity, leading to improved performance.
-
-#### Access Patterns:
+In this particular scenario, we employ the Single Table Design approach to store all related data with the following access patterns:
 
   - Pattern A - Displaying Messages:
 This pattern allows users to view a list of messages belonging to a specific message group. The messages are typically presented in descending order, providing users with an overview of their conversations.
