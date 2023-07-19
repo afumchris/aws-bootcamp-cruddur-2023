@@ -7,6 +7,7 @@
 - [Installation and Configuration of AWS Amplify](#installation-and-configuration-of-aws-amplify)
 - [Implementing API Calls to Amazon Cognito for Custom Signup Signin Confirmation and Recovery Pages](#implementing-api-calls-to-amazon-cognito-for-custom-signup-signin-confirmation-and-recovery-pages)
 - [Server-Side Verification of JWT](#server-side-verification-of-jwt)
+- [Fix Expiring Token](fix-expiring-token)
 - [References](#references)
 
 ### Introduction
@@ -94,10 +95,25 @@ Once signed out, the home page will be displayed without the message by Lore.
 
 ![](assets/afterjwt.png)
 
+### Fix Expiring Token
+
+To address the issue of an expiring token, modify the following files as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/1c2f9b4a3c4c437bd7a111014b9500479e188c62):
+
+  - `frontend-react-js/src/components/MessageForm.js`:
+    - Add import statement for `getAccessToken` function from the `CheckAuth` module.
+    - Update the `await getAccessToken()` line to call the `getAccessToken` function.
+    - Update the `headers` object in the `fetch` request to use the `access_token` variable instead of directly accessing `localStorage.getItem("access_token")`.  
+  - `frontend-react-js/src/lib/CheckAuth.js`:
+    - Export the `getAccessToken` function alongside the existing `checkAuth` function.
+    - Modify the implementation of the `getAccessToken` function to store the access token in the local storage.  
+  - `frontend-react-js/src/pages/HomeFeedPage.js`, `MessageGroupNewPage.js`, `MessageGroupPage.js`, and `MessageGroupsPage.js`:
+    - Add import statement for `getAccessToken` function from the `CheckAuth` module.
+    - Update the `await getAccessToken()` line to call the `getAccessToken` function.
+    - Update the `headers` object in the `fetch` request to use the `access_token` variable instead of directly accessing `localStorage.getItem("access_token")`.
+
 ### References
 
 - AWS Amplify Documentation [link](https://docs.aws.amazon.com/amplify/index.html)
 - Amazon Cognito Documentation [link](https://docs.aws.amazon.com/cognito/index.html)
-
 
 
