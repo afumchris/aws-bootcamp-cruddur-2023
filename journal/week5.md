@@ -8,6 +8,7 @@
   - [DynamoDB Utility Scripts](#dynamodb-utility-scripts)
   - [Implement Conversations with DynamoDB Local](#implement-conversations-with-dynamodb-local)
   - [Implement DynamoDB Stream with AWS Lambda](#implement-dynamodb-stream-with-aws-lambda)
+  - [Fix Timezone](#fix-timezone)
   - [References](#references)
 
 ### Introduction
@@ -20,13 +21,13 @@ In this particular scenario, we employ the Single Table Design approach to store
 
 #### Access Patterns:
 
-  1. Pattern A - Displaying Messages:
+  - Pattern A - Displaying Messages:
 This pattern allows users to view a list of messages belonging to a specific message group. The messages are typically presented in descending order, providing users with an overview of their conversations.
-  2. Pattern B - List of Conversations (All Direct Messages):
+  - Pattern B - List of Conversations (All Direct Messages):
 This access pattern provides users with a comprehensive list of message groups, giving them an overview of all their direct message conversations. Users can quickly access and navigate through different message groups, facilitating efficient communication.
-  3. Pattern C - Creating a New Message in a New Message Group:
+  - Pattern C - Creating a New Message in a New Message Group:
 With this pattern, users can initiate a new conversation by creating a new message in a previously nonexistent message group. This functionality facilitates the start of fresh discussions between users.
-  4. Pattern D - Creating a New Message in an Existing Message Group:
+  - Pattern D - Creating a New Message in an Existing Message Group:
 This pattern allows users to add a new message to an existing message group, thereby extending the ongoing conversation with other users.
 
 To address the specific access patterns, our DynamoDB table requires the implementation of the following code to distinguish between different types of data queries and manipulations:
@@ -196,6 +197,29 @@ Run `docker compose up`, open the frontend `url` and append `/meesages/new/londo
 If the configuration is successful and there are no errors, you should not observe any errors in the CloudWatch logs. You can verify this by checking the CloudWatch service and navigating to the Log Groups section. Look for the log group named `/aws/lambda/cruddur-messaging-stream` as shown in the provided screenshots. 
 
 ![](assets/ddb-cloudwatchlogs.png)
+
+### Fix Timezone
+
+Make the following changes as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/459d77104acb6e28036f4016fa5c5728d518c0bf) to fix the timezone
+
+  - `backend-flask/lib/ddb.py`:
+    - Replace conversion of time to UTC and back to the local timezone with a direct `datetime.now()` call.
+    - Use `datetime.now().isoformat()` to set the `created_at` timestamp accurately.
+  - `bin/ddb/seed`:
+    - Adjust the creation of `created_at` timestamp by subtracting a day and adding minutes.
+  - `frontend-react-js/src/components/ActivityContent.js`:
+    - Update the `format_time_created_at` and `format_time_expires_at` functions to format the timestamp.
+    - Improve the logic for displaying time differences in the activity content.
+  - `frontend-react-js/src/components/MessageGroupItem.js`:
+    - Modify the `format_time_created_at` function to format the timestamp.
+    - Implemente CSS classes based on the active message group UUID.
+  - `frontend-react-js/src/components/MessageItem.css`:
+    - Adjuste the CSS styles for the message item.
+  - `frontend-react-js/src/components/MessageItem.js`:
+    - Modify the `format_time_created_at` function to format the timestamp.
+    - Update the JSX markup for the message item component.
+  - `frontend-react-js/src/lib/DateTimeFormats.js`"
+    - Add utility functions for formatting timestamps and calculating time differences.
 
 
 ### References
