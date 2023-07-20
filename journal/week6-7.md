@@ -295,7 +295,7 @@ aws iam attach-role-policy \
 Go to the AWS Management Console and access the IAM (Identity and Access Management) service. Verify if the task and execution roles for the task definition have been successfully created in the console.
 
 
-#### Backenk-flask ECS Task Definition
+#### Backend-flask ECS Task Definition
 
 Using the provided [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/732daa60d14c9f31e9b7f6750f440d809b09c1b5#diff-fce4cbfaaa6ae500dea2961ebd2e8395ff961a7a764b1cebc1f11325d50a2866) as a guide, create a Task Definition file  `aws/task-definitions/backend-flask.json`. Be sure to modify the values in the JSON file to match those of your AWS account.
 
