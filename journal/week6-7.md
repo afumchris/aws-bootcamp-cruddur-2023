@@ -8,7 +8,7 @@
   - [Launching Containers on ECS](#launching-containers-on-ecs)
   - [Application Load Balancer](#application-load-balancer)
   - [Custom Domain Configuration](#custom-domain-configuration)
-  - [Securing Backend Flask](#securing-backend-flask)
+  - [Securing Backend-Flask](#securing-backend-flask)
   - [Dynamodb Working in Production](#dynamodb-working-in-production)
   - [Enable X-Ray For Frontend and Backend Task Definitions](#enable-x-ray-for-frontend-and-backend-task-definitions)
   - [Cost Consideration](#cost-consideration)
