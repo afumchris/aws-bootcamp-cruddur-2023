@@ -10,6 +10,9 @@
   - [Custom Domain Configuration](#custom-domain-configuration)
   - [Securing Backend Flask](#securing-backend-flask)
   - [Dynamodb Working in Production](#dynamodb-working-in-production)
+  - [Enable X-Ray For Frontend and Backend Task Definitions](#enable-x-ray-for-frontend-and-backend-task-definitions)
+  - [Cost Consideration](#cost-consideration)
+
 
 ### Introduction
 
@@ -653,22 +656,22 @@ Create a `bin/backend/build` script as seen in this [commit](https://github.com/
 
 ###### Push Image:
 
-Create a `backend-flask/bin/docker/push/backend-flask-prod` script as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/2ac24522de1463a4f8600f96399647079d8e3ece#diff-5dcb7ec0fb453e459233265529b912a136f7859b2dd66aeac6e0e76dc19594ab), move the script to the `bin/backend` directory and rename it `push` as seen [here](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/553c4cc299d691883f72000aa0f11dce3cd8051c#diff-e413f1d0638e188c8ef81bf77f508dc58f2fa6361385e47702c7493bedd4e1e0), then execute it with the following `./bin/backend/push`.
+Create a `backend-flask/bin/docker/push/backend-flask-prod` script as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/2ac24522de1463a4f8600f96399647079d8e3ece#diff-5dcb7ec0fb453e459233265529b912a136f7859b2dd66aeac6e0e76dc19594ab), move the script to the `bin/backend` directory and rename it `push` as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/553c4cc299d691883f72000aa0f11dce3cd8051c#diff-e413f1d0638e188c8ef81bf77f508dc58f2fa6361385e47702c7493bedd4e1e0), then execute it with the following command `./bin/backend/push`.
 
 ###### Deploy backend-flask:
 
-Move `backend-flask/bin/ecs/force-deploy-backend-flask` script to `bin/backend/` directory and rename it `deploy` as seen [here](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/553c4cc299d691883f72000aa0f11dce3cd8051c#diff-e413f1d0638e188c8ef81bf77f508dc58f2fa6361385e47702c7493bedd4e1e0), then execute it with the following `bin/backend/deploy`.
+Move `backend-flask/bin/ecs/force-deploy-backend-flask` script to `bin/backend/` directory and rename it `deploy` as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/553c4cc299d691883f72000aa0f11dce3cd8051c#diff-e413f1d0638e188c8ef81bf77f508dc58f2fa6361385e47702c7493bedd4e1e0), then execute it with the following command `./bin/backend/deploy`.
 
 #### confirm messaging
 
 Insert mock user into RDS to confirm messaging using the provided commands: 
 
-  - create a script `backend-flask/bin/ecs/connect-to-backend-flask` as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/2e9d45da6d48fce736e2e87f41f23b7d1aa20d5c#diff-c89114d659d4870396f74ced4412c446f37288ba3b8d1f7b3e772f3b4fe4b4e4), move the script to `/bin/db/` directory and rename it `connect` as seen [here](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/553c4cc299d691883f72000aa0f11dce3cd8051c#diff-08c4aa961dff47eb9dc62d4ff67b06e16960ec2a77fd0314d14573170c96992e), then run the command `./bin/db/connect prod` to connect to the production database.
+  - create a script `backend-flask/bin/ecs/connect-to-backend-flask` as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/2e9d45da6d48fce736e2e87f41f23b7d1aa20d5c#diff-c89114d659d4870396f74ced4412c446f37288ba3b8d1f7b3e772f3b4fe4b4e4), move the script to `/bin/db/` directory and rename it `connect` as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/553c4cc299d691883f72000aa0f11dce3cd8051c#diff-08c4aa961dff47eb9dc62d4ff67b06e16960ec2a77fd0314d14573170c96992e), then run the command `./bin/db/connect prod` to connect to the production database.
   - Enable expanded output mode by entering `\x` on.
   - Execute the command `select * from users;` to view the existing users.
   - Use the following command to insert the mock user into the users table:
 
-```
+```sh
 INSERT INTO public.users (display_name, email, handle, cognito_user_id)
 VALUES
   ('Londo Mollari','lmollari@centari.com' ,'londo' ,'MOCK');
@@ -676,10 +679,54 @@ VALUES
 
   - Execute the command `select * from users;` again to verify that the mock user has been successfully inserted. To exit the database connection, type `\q`.
 
-To verify if messaging is working, visit your dormain name and you should be able to send a message as shown below
+To verify if messaging is working, visit your domain name and you should be able to send a message as shown below
 
 ![](assets/messaging-working.png)
 
+### Enable X-Ray For Frontend and Backend Task Definitions
+
+To enable X-ray for both backend and frontend task definitions, implement the following modifications:
+
+  - In the `backend-flask/services/user_activities.py` file as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/c1a24a13baf2b4bdd2eff53c97f5a90a1edf16b3#diff-f5a1708fa9e56be428a37d6314e4ad7be8af74d9332ada2bc16913095fb0b4c6), Comment out the following, import statement for `xray_recorder` from the `aws_xray_sdk.core` module, the `xray_recorder.begin_subsegment('mock-data')`, and the `xray_recorder.end_subsegment()` line, which closes the subsegment.
+  - as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/e90233a9a75b63a9b049a1bd38095e99088af7b0#diff-fce4cbfaaa6ae500dea2961ebd2e8395ff961a7a764b1cebc1f11325d50a2866) and this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/e90233a9a75b63a9b049a1bd38095e99088af7b0#diff-b1ee9974828856aa33e1eae739e5a1e7b07a9bdbee3b5665e040a451cba663ff), In the backend-flask task definition, the `healthCheck` command was modified from `/backend-flask/bin/flask/health-check` to `/backend-flask/bin/health-check`. A new container definition named "xray" was added for both files. This container is responsible for running the AWS X-Ray daemon, which is used for tracing and analyzing requests in the application.
 
 
+Register the frontend and backend task definitions, and also after making changes to the `backend-flask/services/user_activities.py` file, the next step is to build the backend image incorporating these modifications and push it to the production environment.
 
+###### Build Image:
+```sh
+./bin/backend/build
+```
+
+###### Push Image:
+```sh
+./bin/backend/push
+```
+
+###### Register backend task definition:
+
+Create a script `bin/backend/register` as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/e90233a9a75b63a9b049a1bd38095e99088af7b0#diff-0dabce0e76eea0e68c31089b7e457f85d82d751171f11179e5762ce5ed02c2bc) and execute it with the following command `./bin/backend/register`
+
+###### Register frontend task definition:
+
+Create a script `bin/frontend/register` as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/e90233a9a75b63a9b049a1bd38095e99088af7b0#diff-8921592caf8bb1a59a42ff3e4f695a43b1c50087a5fd029fe181e8ed2f133353) and execute it with the following command `./bin/frontend/register`
+
+###### Deploy backend-flask:
+```sh
+./bin/backend/deploy
+```
+
+###### Deploy frontend-react-js:
+
+Create a script `bin/frontend/deploy` as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/e90233a9a75b63a9b049a1bd38095e99088af7b0#diff-10873cdb459376dde5bea7e6d65ce9f9dcdc51632d8d371039592d0d78336f48) and execute it with the following command `./bin/frontend/deploy`
+
+Go to the AWS console, access ECS (Elastic Container Service), and navigate to the "Tasks" section. There, you should find the following information displayed.
+
+![](assets/xray-backend.png)
+
+
+![](assets/xray-frontend.png)
+
+### Cost Consideration
+
+To optimize costs on the AWS console, set the Fargate services to 0, which will help conserve your AWS budget. By doing so, you'll prevent any unnecessary usage and charges related to Fargate services while still keeping other essential resources active as needed.
