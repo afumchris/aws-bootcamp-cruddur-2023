@@ -20,7 +20,7 @@ export default function ProfileForm(props) {
       await getAccessToken()
       const access_token = localStorage.getItem("access_token")
       const res = await fetch(backend_url, {
-        method: "GET",
+        method: "POST",
         headers: {
           'Origin': "https://3000-afumchris-awsbootcampcr-mq3z0l5930q.ws-eu102.gitpod.io",
           'Authorization': `Bearer ${access_token}`,
