@@ -6,10 +6,9 @@ import DesktopNavigation  from '../components/DesktopNavigation';
 import DesktopSidebar     from '../components/DesktopSidebar';
 import ActivityFeed from '../components/ActivityFeed';
 import ActivityForm from '../components/ActivityForm';
-import ProfileHeading from '../components/ProfileHeading';
-import ProfileForm from '../components/ProfileForm';
-
 import {checkAuth, getAccessToken} from '../lib/CheckAuth';
+import ProfileHeading from '../components/ProfileHeading';
+import ProfileForm from '../components/ProfileForm'
 
 export default function UserFeedPage() {
   const [activities, setActivities] = React.useState([]);
@@ -20,7 +19,6 @@ export default function UserFeedPage() {
   const dataFetchedRef = React.useRef(false);
 
   const params = useParams();
-  const title = `@${params.handle}`;
 
   const loadData = async () => {
     try {
@@ -45,6 +43,7 @@ export default function UserFeedPage() {
     }
   };
 
+
   React.useEffect(()=>{
     //prevents double call
     if (dataFetchedRef.current) return;
@@ -68,7 +67,7 @@ export default function UserFeedPage() {
           <ProfileHeading setPopped={setPoppedProfile} profile={profile} />
           <ActivityFeed activities={activities} />
         </div>
-      </div>
+      </div>  
       <DesktopSidebar user={user} />
     </article>
   );
