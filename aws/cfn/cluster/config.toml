@@ -1,6 +1,6 @@
 [deploy]
-bucket = 'cfn-artifacts'
-region = 'ca-central-1'
+bucket = 'cfn-artifacts-adikaifeanyi'
+region = 'us-east-1'
 stack_name = 'CrdCluster'
 
 [parameters]
