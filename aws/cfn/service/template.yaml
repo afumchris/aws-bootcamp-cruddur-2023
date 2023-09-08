@@ -33,7 +33,7 @@ Parameters:
     Default: backend-flask
   EcrImage:
     Type: String
-    Default: '443659792335.dkr.ecr.ca-central-1.amazonaws.com/backend-flask'
+    Default: '443659792335.dkr.ecr.us-east-1.amazonaws.com/backend-flask'
   EnvOtelServiceName:
     Type: String
     Default: backend-flask
