@@ -52,9 +52,6 @@ Parameters:
     Default: 2
 
   #Backend ------
-  BackendPort:
-    Type: Number
-    Default: 4567
   BackendHealthCheckIntervalSeconds:
     Type: String
     Default: 15
@@ -207,8 +204,8 @@ Resources:
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-security-group-rule-1.html
         - IpProtocol: tcp
           SourceSecurityGroupId: !GetAtt ALBSG.GroupId
-          FromPort: !Ref BackendPort
-          ToPort: !Ref BackendPort
+          FromPort: 4567
+          ToPort: 4567
           Description: ALB HTTP
 
   BackendTG:
@@ -216,7 +213,7 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       # Name: !Sub "${AWS::StackName}BackendTG"
-      Port: !Ref BackendPort
+      Port: 4567
       HealthCheckEnabled: true
       HealthCheckProtocol: !Ref BackendHealthCheckProtocol
       HealthCheckIntervalSeconds: !Ref BackendHealthCheckIntervalSeconds
