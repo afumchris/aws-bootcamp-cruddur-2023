@@ -9,6 +9,7 @@ cfn-lint $CFN_PATH
 aws cloudformation deploy \
   --stack-name "CrdNet" \
   --s3-bucket $CFN_BUCKET \
+  --s3-prefix networking \
   --template-file "$CFN_PATH" \
   --no-execute-changeset \
   --capabilities CAPABILITY_NAMED_IAM

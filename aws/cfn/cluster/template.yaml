@@ -52,6 +52,9 @@ Parameters:
     Default: 2
 
   #Backend ------
+  BackendPort:
+    Type: Number
+    Default: 4567
   BackendHealthCheckIntervalSeconds:
     Type: String
     Default: 15
@@ -163,7 +166,7 @@ Resources:
         - Field: host-header
           HostHeaderConfig:
             Values:
-              - api.adikaifeanyi.com
+              - api.cloudtropper.site
       Actions:
         - Type: forward
           TargetGroupArn: !Ref BackendTG
@@ -204,8 +207,8 @@ Resources:
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-security-group-rule-1.html
         - IpProtocol: tcp
           SourceSecurityGroupId: !GetAtt ALBSG.GroupId
-          FromPort: 4567
-          ToPort: 4567
+          FromPort: !Ref BackendPort
+          ToPort: !Ref BackendPort
           Description: ALB HTTP
 
   BackendTG:
