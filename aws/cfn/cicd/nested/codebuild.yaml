@@ -3,6 +3,7 @@ Description: |
   Codebuild used for baking container images
   - Codebuild Project
   - Codebuild Project Role
+
 Parameters:
   LogGroupPath:
     Type: String
@@ -23,7 +24,9 @@ Parameters:
     Default: 5
   BuildSpec:
     Type: String
-    Default: 'buildspec.yaml'
+    Default: "buildspec.yaml"
+  ArtifactBucketName:
+    Type: String
 Resources:
   CodeBuild:
     # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codebuild-project.html
@@ -32,7 +35,7 @@ Resources:
       QueuedTimeoutInMinutes: !Ref CodeBuildTimeoutMins
       ServiceRole: !GetAtt CodeBuildRole.Arn
       # PrivilegedMode is needed to build Docker images
-      # even though we have No Artifacts, CodePipeline Demands both to be set as CODEPIPLINE
+      # even though we have No Artifacts, CodePipeline Demands both to be set as CODEPIPELINE
       Artifacts:
         Type: CODEPIPELINE
       Environment:
@@ -54,54 +57,64 @@ Resources:
     Properties:
       AssumeRolePolicyDocument:
         Statement:
-        - Action: ['sts:AssumeRole']
-          Effect: Allow
-          Principal:
-            Service: [codebuild.amazonaws.com]
-        Version: '2012-10-17'
+          - Action: ["sts:AssumeRole"]
+            Effect: Allow
+            Principal:
+              Service: [codebuild.amazonaws.com]
+        Version: "2012-10-17"
       Path: /
       Policies:
-        - PolicyName: !Sub ${AWS::StackName}ECRPolicy
+        - PolicyName: !Sub ${AWS::StackName}S3ArtifactAccess
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: "2012-10-17"
             Statement:
               - Action:
-                - ecr:BatchCheckLayerAvailability
-                - ecr:CompleteLayerUpload
-                - ecr:GetAuthorizationToken
-                - ecr:InitiateLayerUpload
-                - ecr:BatchGetImage
-                - ecr:GetDownloadUrlForLayer
-                - ecr:PutImage
-                - ecr:UploadLayerPart
+                  - s3:*
+                Effect: Allow
+                Resource:
+                  - !Sub arn:aws:s3:::${ArtifactBucketName}
+                  - !Sub arn:aws:s3:::${ArtifactBucketName}/*
+        - PolicyName: !Sub ${AWS::StackName}ECRPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:CompleteLayerUpload
+                  - ecr:GetAuthorizationToken
+                  - ecr:InitiateLayerUpload
+                  - ecr:BatchGetImage
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:PutImage
+                  - ecr:UploadLayerPart
                 Effect: Allow
                 Resource: "*"
         - PolicyName: !Sub ${AWS::StackName}VPCPolicy
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: "2012-10-17"
             Statement:
               - Action:
-                - ec2:CreateNetworkInterface
-                - ec2:DescribeDhcpOptions
-                - ec2:DescribeNetworkInterfaces
-                - ec2:DeleteNetworkInterface
-                - ec2:DescribeSubnets
-                - ec2:DescribeSecurityGroups
-                - ec2:DescribeVpcs
+                  - ec2:CreateNetworkInterface
+                  - ec2:DescribeDhcpOptions
+                  - ec2:DescribeNetworkInterfaces
+                  - ec2:DeleteNetworkInterface
+                  - ec2:DescribeSubnets
+                  - ec2:DescribeSecurityGroups
+                  - ec2:DescribeVpcs
                 Effect: Allow
                 Resource: "*"
               - Action:
-                - ec2:CreateNetworkInterfacePermission
+                  - ec2:CreateNetworkInterfacePermission
                 Effect: Allow
                 Resource: "*"
         - PolicyName: !Sub ${AWS::StackName}Logs
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: "2012-10-17"
             Statement:
               - Action:
-                - logs:CreateLogGroup
-                - logs:CreateLogStream
-                - logs:PutLogEvents
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
                 Effect: Allow
                 Resource:
                   - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${LogGroupPath}*
@@ -109,4 +122,4 @@ Resources:
 Outputs:
   CodeBuildProjectName:
     Description: "CodeBuildProjectName"
-    Value: !Sub ${AWS::StackName}Project
+    Value: !Ref CodeBuild
