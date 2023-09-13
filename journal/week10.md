@@ -35,16 +35,16 @@ gp env CFN_BUCKET="cfn-artifacts-adikaifeanyi"
 ### Networking Stack
 
 Create the following files(make sure to change the parameters to yours):
-  - [aws/cfn/networking/template.yaml](aws/cfn/networking/template.yaml)
-  - [aws/cfn/networking/config.toml](aws/cfn/networking/config.toml)
-  - [bin/cfn/networking](bin/cfn/networking) run the bash script to deploy the Networking stack.
+  - [aws/cfn/networking/template.yaml](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/aws/cfn/networking/template.yaml)
+  - [aws/cfn/networking/config.toml](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/aws/cfn/networking/config.toml)
+  - [bin/cfn/networking](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/bin/cfn/networking) run the bash script to deploy the Networking stack.
 
 ### Cluster Stack
 
 Create the following files:
-  - [aws/cfn/cluster/template.yaml](aws/cfn/cluster/template.yaml)
-  - [aws/cfn/cluster/config.toml](aws/cfn/cluster/config.toml)
-  - [bin/cfn/cluster](bin/cfn/cluster) run the bash script to deploy the cluster stack.
+  - [aws/cfn/cluster/template.yaml](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/aws/cfn/cluster/template.yaml)
+  - [aws/cfn/cluster/config.toml](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/aws/cfn/cluster/config.toml)
+  - [bin/cfn/cluster](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/bin/cfn/cluster) run the bash script to deploy the cluster stack.
 
 Navigate to the AWS console and edit Route53 type A records for `api.cloudtropper.site` to point to the CrdClusterALB
 
@@ -53,18 +53,18 @@ Navigate to the AWS console and edit Route53 type A records for `api.cloudtroppe
 Execute the following command `export DB_PASSWORD="your_DB_PASSWORD"` before running the bash script
 
 Create the following files:
-  - [aws/cfn/db/template.yaml](aws/cfn/db/template.yaml)
-  - [aws/cfn/db/config.toml](aws/cfn/cluster/config.toml)
-  - [bin/cfn/db](bin/cfn/db) run the bash script to deploy the db stack.
+  - [aws/cfn/db/template.yaml](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/aws/cfn/db/template.yaml)
+  - [aws/cfn/db/config.toml](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/aws/cfn/db/config.toml)
+  - [bin/cfn/db](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/bin/cfn/db) run the bash script to deploy the db stack.
 
 After the process is completed, retrieve `RDS endpoint` and then proceed to update the `CONNECTION_URL` within AWS System Manager's Parameter Store
 
 ### Service Backend-Flask Stack
 
 Create the following files:
-  - [aws/cfn/db/template.yaml](aws/cfn/service/template.yaml)
-  - [aws/cfn/db/config.toml](aws/cfn/service/config.toml)
-  - [bin/cfn/service](bin/cfn/service) run the bash script to deploy the service stack.
+  - [aws/cfn/db/template.yaml](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/aws/cfn/service/config.toml)
+  - [aws/cfn/db/config.toml](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/aws/cfn/service/template.yaml)
+  - [bin/cfn/service](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/bin/cfn/service) run the bash script to deploy the service stack.
 
 After deploying the service stack, Modify the health check configurations for the target group associated with `CrdClu-Backed-xxx` within the advanced settings, specify the health check port to override and set it to `4567`. The screenshot below indicates that https://api.cloudtropper.site/api/health-check (backend service) is working.
 
@@ -76,23 +76,23 @@ Edit the `gitpod.yml` file as seen in this [commit](https://github.com/afumchris
 
 Create the following files:
 
-  - [ddb/function/lambda_function.py](ddb/function/lambda_function.py)
-  - [ddb/template.yaml](ddb/template.yaml)
-  - [ddb/config.toml](ddb/config.toml)
+  - [ddb/function/lambda_function.py](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/ddb/function/lambda_function.py)
+  - [ddb/template.yaml](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/ddb/template.yaml)
+  - [ddb/config.toml](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/ddb/config.toml)
 
 Create and run the following bash scripts to deploy the `ddb` stack:
-  - [ddb/build](ddb/build) 
-  - [ddb/package](ddb/package)
-  - [ddb/deploy](ddb/deploy)
+  - [ddb/build](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/ddb/build) 
+  - [ddb/package](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/ddb/package)
+  - [ddb/deploy](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/ddb/deploy)
 
 ### CI/CD Nested Stack
 
 Create the following files:
 
-  - [aws/cfn/cicd/nested](aws/cfn/cicd/nested)
-  - [aws/cfn/cicd/template.yaml](aws/cfn/cicd/template.yaml)
-  - [aws/cfn/cicd/config.toml](aws/cfn/cicd/config.toml)
-  - [bin/cfn/cicd](bin/cfn/cicd) run the bash script to deploy the CI/CD Nested Stack
+  - [aws/cfn/cicd/nested](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/aws/cfn/cicd/nested/codebuild.yaml)
+  - [aws/cfn/cicd/template.yaml](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/aws/cfn/cicd/template.yaml)
+  - [aws/cfn/cicd/config.toml](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/aws/cfn/cicd/config.toml)
+  - [bin/cfn/cicd]([bin/cfn/cicd](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/bin/cfn/cicd)) run the bash script to deploy the CI/CD Nested Stack
 
 Navigate to AWS Console's CodePipeline section to verify the successful deployment of your pipeline as shown below
 
@@ -102,11 +102,13 @@ Navigate to AWS Console's CodePipeline section to verify the successful deployme
 
 ### Frontend Stack
 
+Navigate to the hosted zone for "your_domain_name" in Route 53, delete the A record set without specifying a specific record name in [week 6/7](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/journal/week6-7.md#custom-domain-configuration).
+
 Create the following files:
 
-  - [aws/cfn/frontend/template.yaml](aws/cfn/frontend/template.yaml)
-  - [aws/cfn/frontend/config.toml](aws/cfn/frontend/config.toml)
-  - [bin/cfn/frontend](bin/cfn/frontend) run the bash script to deploy the frontend Stack
+  - [aws/cfn/frontend/template.yaml](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/aws/cfn/frontend/template.yaml)
+  - [aws/cfn/frontend/config.toml](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/aws/cfn/frontend/config.toml)
+  - [bin/cfn/frontend](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/bin/cfn/frontend) run the bash script to deploy the frontend Stack
 
 
  
