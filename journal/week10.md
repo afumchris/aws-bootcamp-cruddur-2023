@@ -102,7 +102,7 @@ Navigate to AWS Console's CodePipeline section to verify the successful deployme
 
 ### Frontend Stack
 
-Navigate to the hosted zone for "your_domain_name" in Route 53, delete the A record set without specifying a specific record name in [week 6/7](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/journal/week6-7.md#custom-domain-configuration).
+Navigate to the hosted zone for "your_domain_name" in Route 53, delete the A record set without specifying a specific record name in [week 6/7 domain configuration](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/journal/week6-7.md#custom-domain-configuration).
 
 Create the following files:
 
