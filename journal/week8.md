@@ -14,6 +14,8 @@
        ```sh
        THUMBING_BUCKET_NAME="assets.your_domain_name"
        THUMBING_FUNCTION_PATH="/workspace/aws-bootcamp-cruddur-2023/aws/lambdas/process-images"
+       THUMBING_S3_FOLDER_INPUT="avatars/original"
+       THUMBING_S3_FOLDER_OUTPUT="avatars/processed"
        ```
 
   - Run the following commands:
