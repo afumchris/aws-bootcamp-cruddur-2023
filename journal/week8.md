@@ -58,8 +58,10 @@
  - Create a folder `bin/serverless/files/data.jpg` and upload an image named `data.jpg`
  - Set your domain name as environment variable with the following command
    ```sh
-   export DOMAIN_NAME=`your_domain_name`
-   gp env DOMAIN_NAME=`your_domain_name`
+   export DOMAIN_NAME=your_domain_name
+   gp env DOMAIN_NAME=your_domain_name
+   export UPLOADS_BUCKET_NAME=adikaifeanyi-cruddur-uploaded-avatars
+   gp env UPLOADS_BUCKET_NAME=adikaifeanyi-cruddur-uploaded-avatars 
    ```
    
  - Manually create S3 bucket(`assets.your_domain_name`) in AWS console, so the bucket can live outside the lifecycle of the stack.
@@ -77,4 +79,41 @@ Navigate to S3 bucket inyour AWS console to confirm if `data.jpg` was uploaded s
 
  ## Serving Avatars via Cloudfront   
 
+ Amazon CloudFront is specifically designed to seamlessly integrate with Amazon S3 for serving your S3 content. Utilizing CloudFront for delivering S3 content provides enhanced flexibility and control.
+
+To establish a CloudFront distribution, set up a certificate in the us-east-1 region for *.<your_domain_name>. You can create it through AWS Certificate Manager and, once it's issued, select `Create records in Route 53`.
+
+Certificate Creation Process:
+
+  - Visit AWS Certificate Manager (ACM).
+  - Click on `Request Certificate`.
+  - Choose `Request a public certificate`.
+  - In the "Fully qualified domain name" field, enter `your_domain_name`.
+  - Select `Add Another Name to this certificate` and add `*.your_domain_name`.
+  - Ensure that `DNS validation - recommended` is selected.
+  - Click on `Request`.
+
+To create a CloudFront distribution:
+
+  - Set the Origin domain to point to `assets.your_domain_name`.
+  - Choose Origin access control settings (recommended) and create a control setting.
+  - Select `Redirect HTTP to HTTPS` for the viewer protocol policy.
+  - Choose `CachingOptimized` and `CORS-CustomOrigin` as the optional Origin request policy, and `SimpleCORS` as the response headers policy.
+  - Set the Alternate domain name (CNAME) as `assets.your_domain_name`.
+  - Select the previously created ACM certificate for the Custom SSL certificate.
+  - Once the CloudFront distribution is created, you need to copy its bucket policy. Apply this policy to the `assets.adikaifeanyi.com` bucket under Permissions  Bucket Policy.
+
+To prevent the display of an old version of a file when uploading a new version:
+
+  - Enable invalidation in CloudFront.
+  - Select the CloudFront distribution.
+  - Choose `Invalidations`
+  - Add the pattern `/avatars/*` and click on `Create Invalidation`.
+  - It may take a minute or so for the change to take effect.
+
+This process guarantees that CloudFront will consistently deliver the most recent user-uploaded avatar.
+
+Edit the files as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/fbc2952f1c77f4f388c6830c5b0f31949d0cd4ad) to Update project environment, AWS CDK stack, and Lambda image processing with improved task automation, dependencies, and S3 bucket handling in other to serve avatar image via cloudfront. Also rename the `bin/serverless` folder to `bin/avatar`.
+
+## Backend and Frontend for Profile Page
 
