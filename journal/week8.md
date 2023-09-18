@@ -22,6 +22,7 @@
       -  `cdk bootstrap "aws://account_id/your_aws_region"` to prepare your AWS account to use AWS CDK
       -  `cdk synth` to generate synthesized CloudFormation template for your CDK application.
       -  `cdk deploy` to deploy your CDK application and create AWS resources defined in your CDK code.
+      -  `cdk destroy` to remove or destroy the AWS resources that were created by a CDK stack. 
    
 
 ## Implement Serverless Pipeline
@@ -52,9 +53,28 @@
    cdk synth
    cdk deploy
    ```
- - 
+ - Create a new script [`bin/serverless/build`](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/eeda4d39bb380db117188f1edf1a34eeaff1b2d9#diff-0f12026649ff29f63cd9ff1a7ea11489c80a321fcb665f055d0983990cb619a6) to let the sharp dependency work in Lambda, make the script executable and run it.
+ - Add scripts [`bin/serverless/upload`](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/eeda4d39bb380db117188f1edf1a34eeaff1b2d9#diff-342b82f9713e6f09592c0103d336d9370a766105ae067ae6be17f81e21c1a408) and [`bin/serverless/clear`](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/eeda4d39bb380db117188f1edf1a34eeaff1b2d9#diff-a715a421a7bf4283e6bffca08cffd4bf3bb1b221d95525ec78d854b75cb343c5) for managing S3 uploads and removals. Make sure to make them executable.
+ - Create a folder `bin/serverless/files/data.jpg` and upload an image named `data.jpg`
+ - Set your domain name as environment variable with the following command
+   ```sh
+   export DOMAIN_NAME=`your_domain_name`
+   gp env DOMAIN_NAME=`your_domain_name`
+   ```
+   
+ - Manually create S3 bucket(`assets.your_domain_name`) in AWS console, so the bucket can live outside the lifecycle of the stack.
+ - modify [`thumbing-serverless-cdk/lib/thumbing-serverless-cdk-stack.ts`](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/eeda4d39bb380db117188f1edf1a34eeaff1b2d9#diff-6be534b5f75d78dfcb7e3e037c1d79a5012aa2c034e836b0b90e048fce60b831) to:
+     - Modify bucket creation to support importing existing buckets.
+     - Add Lambda event notifications for S3 objects and SNS topics.
+     - Create policies for S3 bucket access and SNS topic publishing.
+  
+ - Run `cdk deploy` to create a change set and confirm if the bucket lived outside the lifecycle of the stack and then `cdk destroy`
+ - Run `cdk deploy` to deploy your stack resources
+ - Execute `./bin/serverless/upload` to upload `data.jpg` into `avatars/original/` folder in your S3 bucket.
+
+Navigate to S3 bucket inyour AWS console to confirm if `data.jpg` was uploaded successfully.
    
 
-    
+ ## Serving Avatars via Cloudfront   
 
 
