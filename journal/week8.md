@@ -232,24 +232,15 @@ Note that configuring CORS settings in API Gateway is not required. If you have 
 ## Proof of Implementation
 
 
-assets/api-url.png
+![](assets/api-url.png)
 
-assets/avatar-upload.png
+![](assets/avatar-upload.png)
 
-assets/cloudfront.png
+![](assets/cloudfront.png)
 
-assets/migrate.png
+![](assets/migrate.png)
 
-assets/uploaded-bucket.png
+![](assets/uploaded-bucket.png)
 
-
-
-
-
-
-
-
-
-
-
+![](assets/edit-bio.png)
 
