@@ -117,3 +117,43 @@ Edit the files as seen in this [commit](https://github.com/afumchris/aws-bootcam
 
 ## Backend and Frontend for Profile Page
 
+For the backend, create and modify the following files:
+
+  - [backend-flask/db/sql/users/show.sql](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/backend-flask/db/sql/users/show.sql)
+  - [backend-flask/db/sql/users/update.sql](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/backend-flask/db/sql/users/update.sql) 
+  - [backend-flask/services/user_activities.py](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/backend-flask/services/user_activities.py)
+  - [backend-flask/services/update_profile.py](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/backend-flask/services/update_profile.py)
+  - [backend-flask/app.py](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/backend-flask/app.py)
+
+For the frontend, create the modify the following files:
+
+  - [frontend-react-js/src/components/ActivityFeed.js](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/components/ActivityFeed.js)
+  - [frontend-react-js/src/components/CrudButton.js](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/components/CrudButton.js)
+  - [frontend-react-js/src/components/DesktopNavigation.js](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/components/DesktopNavigation.js)
+  - [frontend-react-js/src/components/EditProfileButton.css](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/components/EditProfileButton.css)
+  - [frontend-react-js/src/components/EditProfileButton.js](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/components/EditProfileButton.js)
+  - [frontend-react-js/src/components/Popup.css](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/components/Popup.css)
+  - [frontend-react-js/src/components/ProfileAvatar.css](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/components/ProfileAvatar.css)
+  - [frontend-react-js/src/components/ProfileAvatar.js](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/components/ProfileAvatar.js)
+  - [frontend-react-js/src/components/ProfileForm.css](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/components/ProfileForm.css)
+  - [frontend-react-js/src/components/ProfileForm.js](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/components/ProfileForm.js)
+  - [frontend-react-js/src/components/ProfileHeading.css](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/components/ProfileHeading.css)
+  - [frontend-react-js/src/components/ProfileHeading.js](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/components/ProfileHeading.js)
+  - [frontend-react-js/src/components/ProfileInfo.js](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/components/ProfileInfo.js)
+  - [frontend-react-js/src/components/ReplyForm.css](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/components/ReplyForm.css)
+  - [frontend-react-js/src/pages/HomeFeedPage.js](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/pages/HomeFeedPage.js)
+  - [frontend-react-js/src/pages/NotificationsFeedPage.js](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/pages/NotificationsFeedPage.js)
+  - [frontend-react-js/src/pages/UserFeedPage.js](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/pages/UserFeedPage.js)
+  - [frontend-react-js/src/lib/CheckAuth.js](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/lib/CheckAuth.js)
+  - [frontend-react-js/src/App.js](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/App.js)
+  - [frontend-react-js/jsconfig.json](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/jsconfig.json)
+
+
+## DataBase Migration
+
+
+
+
+
+
+
