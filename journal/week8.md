@@ -151,7 +151,35 @@ For the frontend, create the modify the following files:
 
 ## DataBase Migration
 
+As our previous PostgreSQL database lacked a bio column, we need to perform a migration to add this column. Additionally, we must update certain backend scripts to enable users to edit their bios and save the changes to the database.
 
+Follow these precise steps:
+
+  - Create and execute [`bin/bootstrap`](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/bin/bootstrap) script to generate `frontend` and `backend` `env var` and `ECR` login before `docker compose up`.
+  - Create and execute [`bin/prepare`](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/bin/prepare) script.
+  - Create an empty file at `backend-flask/db/migrations/.keep`.
+  - Create an executable script named [`bin/generate/migration`](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/bin/generate/migration).
+  - Run the command `./bin/generate/migration add_bio_column`. This will generate a `Python` script, a `backend-flask/db/migrations/1690443440065819_add_bio_column.py` will bw generated
+  - Edit the generated` Python` script by adding the necessary SQL commands as seen [here](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/backend-flask/db/migrations/1690443440065819_add_bio_column.py).
+  - Update the [`backend-flask/db/schema.sql`](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/backend-flask/db/schema.sql) file.
+  - Also, update the [`backend-flask/lib/db.py`](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/backend-flask/lib/db.py) file, ensuring it includes the verbose option.
+  - Create executable scripts named [`bin/db/migrate`](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/bin/db/migrate) and [`bin/db/rollback`](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/bin/db/rollback).
+  - Execute `./bin/db/migrate`. This action will add a new column named `bio` to the `users` database table.
+
+By following these precise instructions, you will successfully `migrate` the `database` to include the `bio column` and enable users to edit and save their `bios`.
+
+## Implement Avatar Uploading
+
+To implement Avatar uploading we need to create an API endpoint that triggers the use of a `presigned URL` in the format of `https://API_ID.execute-api.AWS_REGION.amazonaws.com`. This presigned URL is designed to grant access to the `S3` bucket named `adikaifeanyi-uploaded-avatars` and facilitate the delivery of `uploaded images` to this `bucket`.
+
+Pre-Requisites:
+
+  - Create a Lambda Function for User Authorization:
+     - Create a Lambda function named `lambda-authorizer` to handle user authorization.
+  - Create a Lambda Function for Image Upload:
+     - Create a Lambda function named `cruddur-upload-avatar` to handle image uploads to S3.
+  - Create an API Gateway:
+     - Create an API Gateway that will invoke the Lambda functions.
 
 
 
