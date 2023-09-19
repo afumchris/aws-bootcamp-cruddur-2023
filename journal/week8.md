@@ -39,7 +39,7 @@
      - Create a helper module [`s3-image-processing.js`](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/98183096220cb7cfc4c3f3812fb8243687d8ad79#diff-40d8b09d181ff1a7d3c1b1f69f06d6015e074bf996803cd409c532548a43bd9c) for image processing functions.
      - Add a [`test.js`](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/98183096220cb7cfc4c3f3812fb8243687d8ad79#diff-16ef85616d0f53b0b98e044b5824337e30dc405fd936d9dc48373ef8c69fd6dc) file to test the image processing functions.
 
-  - Edit the `thumbing-serverless-cdk/.env.example` file  as seen [here](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/98183096220cb7cfc4c3f3812fb8243687d8ad79#diff-3a26f6bb4f45339b6822d778cdb41d2ff72716636966a7a43c48a6b0a057307f) to Update environment variables for the CDK stack.
+  - Edit the `thumbing-serverless-cdk/.env.example` file  as seen [here](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/98183096220cb7cfc4c3f3812fb8243687d8ad79#diff-3a26f6bb4f45339b6822d778cdb41d2ff72716636966a7a43c48a6b0a057307f) to update environment variables for the CDK stack.
   - cd into `aws/lambdas/process-images` folder and run the following commands
     ```
     npm init -y
@@ -180,6 +180,74 @@ Pre-Requisites:
      - Create a Lambda function named `cruddur-upload-avatar` to handle image uploads to S3.
   - Create an API Gateway:
      - Create an API Gateway that will invoke the Lambda functions.
+   
+To successfully implement the setups mentioned previously, follow these steps:
+
+  - Create a folder `aws/lambdas/cruddur-upload-avatar`
+     - Create a file [`aws/lambdas/cruddur-upload-avatar/function.rb`](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/aws/lambdas/cruddur-upload-avatar/function.rb)
+     - cd into the `aws/lambdas/cruddur-upload-avatar` and run `bundle init`
+     - Edit the `aws/lambdas/cruddur-upload-avatar/Gemfile` as seen [here](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/aws/lambdas/cruddur-upload-avatar/Gemfile)
+     - Run `bundle install` and `bundle exec ruby function.rb`
+  - Create a folder `aws/lambdas/lambda-authorizer`
+     - Create a file [`aws/lambdas/lambda-authorizer/index.js`](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/aws/lambdas/lambda-authorizer/index.js)
+     - cd into the `aws/lambdas/lambda-authorizer` and run `npm install aws-jwt-verify --save`
+     - Run `zip -r lambda_authorizer.zip` to download everything in this folder into a `zip` file which will be uploaded into `CruddurApiGatewayLambdaAuthorizer`.
+   
+
+In AWS console navigate to Lambda, you need to create the following two functions:
+
+CruddurAvatarUpload:
+
+  - Select `Ruby 2.7` as runtime
+  - Utilize the source code provided in `aws/lambdas/cruddur-upload-avatar/function.rb`.
+  - Replace the `Access-Control-Allow-Origin` with your own `Gitpod frontend URL`.
+  - Rename the `Handler` as `function.handler`.
+  - Add an environment variable named `UPLOADS_BUCKET_NAME`.
+  - Create a new policy called `PresignedUrlAvatarPolicy` using the configuration found in [`aws/policies/s3-upload-avatar-presigned-url-policy.json`](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/aws/policies/s3-upload-avatar-presigned-url-policy.json) 
+  - Attach this policy to the role assigned to the Lambda function.
+
+CruddurApiGatewayLambdaAuthorizer:
+
+  - Select `Node.js 18.x` as runtime
+  - Upload the `lambda_authorizer.zip` file as the code source.
+  - Add the required environment variables `USER_POOL_ID` and `CLIENT_ID` with your Cognito clients `USER_POOL_ID` and `AWS_COGNITO_USER_POOL_CLIENT_ID` respectively..
+
+Update the S3 Bucket's CORS Policy:
+
+Under the permissions for `adikaifeanyi-uploaded-avatars` edit `Cross-Origin resource sharing` with this [S3 CORS Policy](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/aws/s3/cors.json)
+
+Create an API Gateway in the AWS console:
+
+  - Within API Gateway, establish an HTTP API with the format api.your_domain_name.
+  - Set up the Two Routes:
+    - For the route POST `/avatars/key_upload`:
+       - Implement the `CruddurJWTAuthorizer` as the authorizer, which invokes the Lambda function `CruddurApiGatewayLambdaAuthorizer`.
+       - Configure the integration to use the `CruddurAvatarUpload` function.
+    - For the route OPTIONS `/{proxy+}`:
+       - This route doesn't require an authorizer.
+       - Set up the integration to utilize the `CruddurAvatarUpload` function.
+     
+Note that configuring CORS settings in API Gateway is not required. If you have previously configured CORS, it is advisable to click the "Clear" option to prevent potential CORS-related issues.
+
+## Proof of Implementation
+
+
+assets/api-url.png
+
+assets/avatar-upload.png
+
+assets/cloudfront.png
+
+assets/migrate.png
+
+assets/uploaded-bucket.png
+
+
+
+
+
+
+
 
 
 
