@@ -12,7 +12,7 @@
 
 ### Introduction
 
-Week 8 outlines precise steps for setting up a serverless architecture using AWS services. It covers CDK setup, serverless pipeline, database migration, avatar uploading, and CloudFront integration for efficient development.
+Week 8 outlines precise steps for setting up a serverless image processing architecture using AWS services. It covers CDK setup, serverless pipeline, database migration, avatar uploading, and CloudFront integration for efficient development.
 
 ### CDK Setup
 
