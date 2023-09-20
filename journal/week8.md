@@ -1,6 +1,20 @@
 # Week 8 — Serverless Image Processing
 
-## CDK Setup
+## Table of Contents:
+
+  - [Introduction](#introduction)
+  - [CDK Setup](#cdk-setup)
+  - [Implement Serverless Pipeline](#implement-serverless-pipeline)
+  - [Serving Avatars via Cloudfront](#serving-avatars-via-cloudfront)
+  - [Backend and Frontend for Profile Page](#backend-and-frontend-for-profile-page)
+  - [DataBase Migration](#database-migration)
+  - [Implement Avatar Uploading](#implement-avatar-uploading)
+
+### Introduction
+
+Week 8 outlines precise steps for setting up a serverless architecture using AWS services. It covers CDK setup, serverless pipeline, database migration, avatar uploading, and CloudFront integration for efficient development.
+
+### CDK Setup
 
   - create a new folder `thumbing-serverless-cdk` to contain cdk dependencies and pieces we need.
   - cd into `thumbing-serverless-cdk` directory and Run the following commands:
@@ -25,7 +39,7 @@
       -  `cdk destroy` to remove or destroy the AWS resources that were created by a CDK stack. 
    
 
-## Implement Serverless Pipeline
+### Implement Serverless Pipeline
 
   - Edit the `.gitpod.yml` file as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/98183096220cb7cfc4c3f3812fb8243687d8ad79#diff-370a022e48cb18faf98122794ffc5ce775b2606b09a9d1f80b71333425ec078e) to:
      - Install the AWS CDK globally.
@@ -77,7 +91,7 @@
 Navigate to S3 bucket inyour AWS console to confirm if `data.jpg` was uploaded successfully.
    
 
- ## Serving Avatars via Cloudfront   
+ ### Serving Avatars via Cloudfront   
 
  Amazon CloudFront is specifically designed to seamlessly integrate with Amazon S3 for serving your S3 content. Utilizing CloudFront for delivering S3 content provides enhanced flexibility and control.
 
@@ -115,7 +129,7 @@ This process guarantees that CloudFront will consistently deliver the most recen
 
 Edit the files as seen in this [commit](https://github.com/afumchris/aws-bootcamp-cruddur-2023/commit/fbc2952f1c77f4f388c6830c5b0f31949d0cd4ad) to Update project environment, AWS CDK stack, and Lambda image processing with improved task automation, dependencies, and S3 bucket handling in other to serve avatar image via cloudfront. Also rename the `bin/serverless` folder to `bin/avatar`.
 
-## Backend and Frontend for Profile Page
+### Backend and Frontend for Profile Page
 
 For the backend, create and modify the following files:
 
@@ -149,7 +163,7 @@ For the frontend, create the modify the following files:
   - [frontend-react-js/jsconfig.json](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/jsconfig.json)
 
 
-## DataBase Migration
+### DataBase Migration
 
 As our previous PostgreSQL database lacked a bio column, we need to perform a migration to add this column. Additionally, we must update certain backend scripts to enable users to edit their bios and save the changes to the database.
 
@@ -168,7 +182,7 @@ Follow these precise steps:
 
 By following these precise instructions, you will successfully `migrate` the `database` to include the `bio column` and enable users to edit and save their `bios`.
 
-## Implement Avatar Uploading
+### Implement Avatar Uploading
 
 To implement Avatar uploading we need to create an API endpoint that triggers the use of a `presigned URL` in the format of `https://API_ID.execute-api.AWS_REGION.amazonaws.com`. This presigned URL is designed to grant access to the `S3` bucket named `adikaifeanyi-uploaded-avatars` and facilitate the delivery of `uploaded images` to this `bucket`.
 
@@ -229,16 +243,15 @@ Create an API Gateway in the AWS console:
      
 Note that configuring CORS settings in API Gateway is not required. If you have previously configured CORS, it is advisable to click the "Clear" option to prevent potential CORS-related issues.
 
-## Proof of Implementation
 
 
-![](assets/api-url.png)
-
-![](assets/avatar-upload.png)
+Below is proof of implementation:
 
 ![](assets/cloudfront.png)
 
 ![](assets/migrate.png)
+
+![](assets/api-url.png)
 
 ![](assets/uploaded-bucket.png)
 
