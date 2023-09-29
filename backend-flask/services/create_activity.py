@@ -1,5 +1,5 @@
-import uuid
 from datetime import datetime, timedelta, timezone
+
 from lib.db import db
 
 class CreateActivity:
@@ -43,7 +43,7 @@ class CreateActivity:
       }   
     else:
       expires_at = (now + ttl_offset)
-      uuid = CreateActivity.create_activity(user_handle, message, expires_at)
+      uuid = CreateActivity.create_activity(user_handle,message,expires_at)
 
       object_json = CreateActivity.query_object_activity(uuid)
       model['data'] = object_json

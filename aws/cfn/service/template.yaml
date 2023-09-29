@@ -4,6 +4,7 @@ Description: |
   Fargate Service
   Execution Role
   Task Role
+
 Parameters:
   NetworkingStack:
     Type: String
@@ -54,38 +55,21 @@ Parameters:
     Default: "*"
   SecretsAWSAccessKeyId:
     Type: String
-    Default: 'arn:aws:ssm:us-east-1:443659792335:parameter/cruddur/backend-flask/AWS_ACCESS_KEY_ID'
+    Default: arn:aws:ssm:us-east-1:443659792335:parameter/cruddur/backend-flask/AWS_ACCESS_KEY_ID'
   SecretsSecretAccessKey:
     Type: String
-    Default: 'arn:aws:ssm:us-east-1:443659792335:parameter/cruddur/backend-flask/AWS_SECRET_ACCESS_KEY'
+    Default: arn:aws:ssm:us-east-1:443659792335:parameter/cruddur/backend-flask/AWS_SECRET_ACCESS_KEY'
   SecretsConnectionUrl:
     Type: String
-    Default: 'arn:aws:ssm:us-east-1:443659792335:parameter/cruddur/backend-flask/CONNECTION_URL'
+    Default: arn:aws:ssm:us-east-1:443659792335:parameter/cruddur/backend-flask/CONNECTION_URL'
   SecretsRollbarAccessToken:
     Type: String
-    Default: 'arn:aws:ssm:us-east-1:443659792335:parameter/cruddur/backend-flask/ROLLBAR_ACCESS_TOKEN'
+    Default: arn:aws:ssm:us-east-1:443659792335:parameter/cruddur/backend-flask/ROLLBAR_ACCESS_TOKEN'
   SecretsOtelExporterOltpHeaders:
     Type: String
-    Default: 'arn:aws:ssm:us-east-1:443659792335:parameter/cruddur/backend-flask/OTEL_EXPORTER_OTLP_HEADERS'
+    Default: arn:aws:ssm:us-east-1:443659792335:parameter/cruddur/backend-flask/OTEL_EXPORTER_OTLP_HEADERS'
   
 Resources:
-  ServiceSG:
-    # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-security-group.html
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupName: !Sub "${AWS::StackName}AlbSG"
-      GroupDescription: Public Facing SG for our Cruddur ALB
-      VpcId:
-        Fn::ImportValue:
-          !Sub ${NetworkingStack}VpcId
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          SourceSecurityGroupId:
-            Fn::ImportValue:
-              !Sub ${ClusterStack}ALBSecurityGroupId
-          FromPort: 4567
-          ToPort: 4567
-          Description: ALB HTTP
   FargateService:
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ecs-service.html
     Type: AWS::ECS::Service
@@ -106,11 +90,12 @@ Resources:
               !Sub "${ClusterStack}BackendTGArn"
           ContainerName: 'backend-flask'
           ContainerPort: !Ref ContainerPort
-      NetworkConfiguration:  
+      NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
           SecurityGroups:
-            - !GetAtt ServiceSG.GroupId
+            - Fn::ImportValue:
+                !Sub "${ClusterStack}ServiceSecurityGroupId"
           Subnets:
             Fn::Split:
               - ","
@@ -165,7 +150,7 @@ Resources:
               - 'CMD-SHELL'
               - 'python /backend-flask/bin/health-check'
             Interval: 30
-            Timeout: 5
+            Timeout: 6
             Retries: 3
             StartPeriod: 60
           PortMappings:
