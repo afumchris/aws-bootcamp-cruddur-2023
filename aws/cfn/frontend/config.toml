@@ -1,0 +1,9 @@
+[deploy]
+bucket = 'cfn-artifacts-adikaifeanyi'
+region = 'us-east-1'
+stack_name = 'CrdFrontend'
+
+[parameters]
+CertificateArn = 'arn:aws:acm:us-east-1:443659792335:certificate/32e64ece-ec0f-48cd-9a27-a0b431637cf6'
+WwwBucketName = 'www.cloudtropper.site'
+RootBucketName = 'cloudtropper.site'
