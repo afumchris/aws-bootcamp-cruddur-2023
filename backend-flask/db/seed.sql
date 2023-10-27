@@ -4,7 +4,7 @@ VALUES
   ('Donny Darko', 'donatellidarko@gmail.com', 'donnydarko', 'MOCK'),
   ('Andrew Bayko', 'bayko@exampro.co', 'bayko', 'MOCK'),
   ('Londo Mollari','lmollari@centari.com' ,'londo' ,'MOCK'),
-  ('Mat Abet','martinabetianbe@gmail.com' , 'matbet' ,'MOCK');
+  ('Mat Bet','martinabetianbe@gmail.com' , 'matbet' ,'MOCK');
 
 INSERT INTO public.activities (user_uuid, message, expires_at)
 VALUES
