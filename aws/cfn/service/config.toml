@@ -6,3 +6,4 @@ stack_name = 'CrdSrvBackendFlask'
 [parameters]
 EnvFrontendUrl = 'https://cloudtropper.site'
 EnvBackendUrl = 'https://api.cloudtropper.site'
+DDBMessageTable = 'CrdDdb-DynamoDBTable-X59DMGWQI1OX'
