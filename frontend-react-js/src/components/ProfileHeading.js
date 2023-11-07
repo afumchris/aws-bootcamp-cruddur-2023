@@ -4,7 +4,7 @@ import EditProfileButton from '../components/EditProfileButton';
 import ProfileAvatar from 'components/ProfileAvatar'
 
 export default function ProfileHeading(props) {
-  const backgroundImage = 'url("https://assets.adikaifeanyi.com/banners/banner.jpg")';
+  const backgroundImage = 'url("https://assets.cloudtropper.site/banners/movies.jpg")';
   const styles = {
     backgroundImage: backgroundImage,
     backgroundSize: 'cover',
