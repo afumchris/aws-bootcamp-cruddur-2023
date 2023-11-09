@@ -117,6 +117,12 @@ To create a CloudFront distribution:
   - Select the previously created ACM certificate for the Custom SSL certificate.
   - Once the CloudFront distribution is created, you need to copy its bucket policy. Apply this policy to the `assets.adikaifeanyi.com` bucket under Permissions  Bucket Policy.
 
+In order to visit `https://assets.<your_domain_name>/avatars/data.jpg` to see the processed image, we need to create a record via Route 53:
+
+- set record name as `assets.<your_domain_name>`
+- turn on alias, route traffic to alias to CloudFront distribution
+- in my case, you can see my profile at https://assets.adikaifeanyi.com/avatars/data.jpg
+
 To prevent the display of an old version of a file when uploading a new version:
 
   - Enable invalidation in CloudFront.
