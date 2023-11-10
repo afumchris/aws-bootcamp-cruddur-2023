@@ -12,6 +12,9 @@
 - [DynamoDB Stack](#dynamodb-stack)
 - [CICD Nested Stack](#cicd-nested-stack)
 - [Frontend Stack](#frontend-stack)
+- [Static Website Hosting for Frontend](#static-website-hosting-for-rontend)
+- [Settings for DB](#settings-for-db)
+- [Clean Up](#clean-up)
 
 ### Introduction
 
@@ -109,6 +112,68 @@ Create the following files:
   - [aws/cfn/frontend/template.yaml](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/aws/cfn/frontend/template.yaml)
   - [aws/cfn/frontend/config.toml](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/aws/cfn/frontend/config.toml)
   - [bin/cfn/frontend](https://github.com/afumchris/aws-bootcamp-cruddur-2023/blob/main/bin/cfn/frontend) run the bash script to deploy the frontend Stack
+
+
+## Static Website Hosting for Frontend
+
+We use a Ruby-based tool to sync a folder from local development to S3 bucket, and then invalidate the CloudFront cache.
+
+Create the following scripts:
+
+- `./bin/frontend/static-build` and `./bin/frontend/sync`
+- `./erb/sync.env.erb` (change to your own `SYNC_S3_BUCKET` and `SYNC_CLOUDFRONT_DISTRIBUTION_ID`)
+- `./tmp/.keep` as a placeholder
+- `Gemfile`
+- `Rakefile`
+- `./bin/cfn/sync`
+
+Also update `./bin/frontend/generate-env` and frontend components
+
+Now we initialize the static hosting by uploading the frontend to S3 bucket:
+
+- run `./bin/frontend/static-build`
+- `cd frontend-react-js` then `zip -r build.zip build/`
+- download and decompress the zip, and upload everything inside the build folder to s3://cloudtropper.site
+
+For syncing:
+
+- Install by `gem install aws_s3_website_sync dotenv`
+- Run `./bin/frontend/generate-env` to generate `sync.env`
+- Run `./bin/frontend/sync` to sync
+- Run `./bin/cfn/sync` to create stack `CrdSyncRole`, add the permissions by creating an inline policy `S3AccessForSync` for the created `CrdSyncRole` with S3 service, actions of GetObject, PutObject, ListBucket and DeleteObject, resources specific to bucket `beici-demo.xyz`, and resource with the same bucket and any object.
+
+Later if frontend is changed, we can sync by running `./bin/frontend/static-build` and then `./bin/frontend/sync`.
+
+## Settings for DB
+
+In order to do some DB migration from gitpod, we firstly need to edit inbound rules for `CrdDbRDSSG` to allow gitpod IP. Then update the following env according to our CFN:
+
+```sh
+export GITPOD_IP=$(curl ifconfig.me)
+export DB_SG_ID="your_security_group_id_of_CrdDbRDSSG"
+gp env DB_SG_ID="your_security_group_id_of_CrdDbRDSSG"
+export DB_SG_RULE_ID="corresponding_sgr_for_gitpod"
+gp env DB_SG_RULE_ID="corresponding_sgr_for_gitpod"
+export PROD_CONNECTION_URL='postgresql://cruddurroot:<your_password>@<endpoint_of_cruddur-instance>:5432/cruddur'
+gp env PROD_CONNECTION_URL='postgresql://cruddurroot:<your_password>@<endpoint_of_cruddur-instance>:5432/cruddur'
+
+./bin/rds/update-sg-rule
+./bin/db/schema-load prod
+```
+
+Since we need to add other columns to the RDS DB, run `./bin/generate/migration reply_to_activity_uuid_to_string` to generate `backend-flask/db/migrations/xxxxx_reply_to_activity_uuid_to_string.py`, edit this python file and then run `CONNECTION_URL=$PROD_CONNECTION_URL ./bin/db/migrate`. Column `bio` will be added to the `users` table, and `reply_to_activity_uuid` added to the `activities` table.
+
+Plus, in `cruddur-post-confirmation` Lambda, change `CONNECTION_URL`, VPC (change to the ones created by CFN, create a new `CognitoLambdaSG` with the `CrdNet` VPC), edit inbound rules of `CrdDbRDSSG` to allow `CognitoLambdaSG`.
+
+## Clean Up
+
+Clean up backend and frontend to:
+
+- refactor to use JWT Decorator, app.py, and routes
+- implement replies for posts
+- improve error handling
+
+Since the backend is updated, we can trigger CICD by merging this branch to the prod branch. Since the frontend is also updated, we can sync by running `./bin/frontend/static-build` and then `./bin/frontend/sync`.
 
 
  
