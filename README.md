@@ -29,4 +29,4 @@ The `/journal` directory contains
 - [x] [Week 6/7 — Deploying Containers, Solving CORS with a Load Balancer and Custom Domain](journal/week6-7.md)
 - [x] [Week 8 — Serverless Image Processing](journal/week8.md)
 - [x] [Week 9 — CI/CD with CodePipeline, CodeBuild and CodeDeploy](journal/week9.md)
-- [ ] [Week 10](journal/week10.md)
+- [x] [Week 10 — CloudFormation](journal/week10.md)
